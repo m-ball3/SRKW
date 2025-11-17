@@ -23,7 +23,7 @@ library(ggplot2)
 library(seqinr)
 library(dplyr)
 
-diet.seqs.file <- "/gscratch/coenv/mball3/WADE003-arctic-pred/rawdata/16SP2"
+diet.seqs.file <- "/gscratch/coenv/mball3/SRKW/rawdata/16SP1"
 
 # uses Arctc Predator 16S database
 ## should maybe get this: 16S_salmon_groundfish_reference_database_2022.fasta
@@ -137,5 +137,5 @@ rownames(merged.taxa) <- taxa.df$seq
 
 
 ### Save data
-save(seqtab.nochim, freq.nochim, track, taxa, genus.species, species, merged.taxa, file = "WADE003-arcticpred_dada2_QAQC_12SP1_output-addSpecies-130;30-4.Rdata")
+save(seqtab.nochim, freq.nochim, track, taxa, genus.species, species, merged.taxa, file = "SRKW-diet-16SP1.Rdata")
 
