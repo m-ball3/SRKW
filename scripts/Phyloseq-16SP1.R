@@ -25,10 +25,10 @@ library(tibble)
 
 # Loads dada2 output
 #load("C:/Users/MBall/OneDrive/文档/WADE LAB/Arctic-predator-diet-microbiome/DADA2/DADA2 Outputs/WADE003-arcticpred_dada2_QAQC_16SP2_output.Rdata")
-load("DADA2/DADA2 Outputs/SRKW-diet-16SP1.Rdata")
+load("DADA2/DADA2 Outputs/Plate1/SRKW-diet-16SP1.Rdata")
 
 # Gets sample metadata
-samdf <- read.csv("metadata/SRKW_Diet_Plate1_MetaData.csv")
+samdf <- read.csv("metadata/Plate1/SRKW_Diet_Plate1_MetaData.csv")
 
 # ------------------------------------------------------------------
 # Ensures rownames are the same
@@ -140,11 +140,11 @@ fam.rel.plot <- plot_bar(ps16s.rel, fill="Family")+
 fam.rel.plot
 
 #saves plots 
-ggsave("Deliverables/srkw-species.png", plot = sp.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/Plate1/srkw-species.png", plot = sp.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
 
-ggsave("Deliverables/srkw-genus.png", plot = gen.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/Plate1/srkw-genus.png", plot = gen.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
 
-ggsave("Deliverables/srkw-family.png", plot = fam.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/Plate1/srkw-family.png", plot = fam.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
 
 # ------------------------------------------------------------------
 # FORMATS DATA AND PLOTS RELATIVE ABUNDANCE BY PRE OR POST HORMONE ANALYSIS
@@ -219,8 +219,8 @@ faucet
 
 
 #saves plots 
-ggsave("Deliverables/srkw-pre-post-hormone.relative.png", plot = faucet, width = 16, height = 8, units = "in", dpi = 300)
-ggsave("Deliverables/srkw-pre-post-hormone.absolute.png", plot = faucet.abs, width = 16, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/Plate1/srkw-pre-post-hormone.relative.png", plot = faucet, width = 16, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/Plate1/srkw-pre-post-hormone.absolute.png", plot = faucet.abs, width = 16, height = 8, units = "in", dpi = 300)
 
 # ------------------------------------------------------------------
 # TABLES
@@ -228,7 +228,7 @@ ggsave("Deliverables/srkw-pre-post-hormone.absolute.png", plot = faucet.abs, wid
 
 # CREATES ABSOLUTE SAMPLES X SPECIES TABLE 
 otu.abs <- as.data.frame(otu_table(ps.16s))
-colnames(otu.abs) <- as.data.frame(tax_table(ps.16s))$Species.y
+colnames(otu.abs) <- as.data.frame(tax_table(ps.16s))$Species
 
 ## Adds ADFG Sample ID as a column
 otu.abs$Specimen.ID <- samdf$Specimen.ID
@@ -238,7 +238,7 @@ otu.abs <- otu.abs[, c(ncol(otu.abs), 1:(ncol(otu.abs)-1))]
 
 # CREATES RELATIVE SAMPLES X SPECIES TABLE
 otu.prop <- as.data.frame(otu_table(ps16s.rel))
-colnames(otu.prop) <- as.data.frame(tax_table(ps16s.rel))$Species.y
+colnames(otu.prop) <- as.data.frame(tax_table(ps16s.rel))$Species
 
 ## Adds ADFG Sample ID as a column (do NOT set as row names if not unique)
 otu.prop$Specimen.ID <- samdf$Specimen.ID
@@ -254,6 +254,6 @@ is.num <- sapply(otu.prop, is.numeric)
 otu.prop[is.num] <- lapply(otu.prop[is.num], round, 3)
 
 # Writes to CSV
-write.csv(otu.abs, "ADFG_16s_absolute_speciesxsamples.csv", row.names = FALSE)
-write.csv(otu.prop, "ADFG_16s_relative_speciesxsamples.csv", row.names = FALSE)
+write.csv(otu.abs, "./Deliverables/Plate1/SRKW_absolute_speciesxsamples.csv", row.names = FALSE)
+write.csv(otu.prop, "./Deliverables/Plate1/SRKW_relative_speciesxsamples.csv", row.names = FALSE)
 
