@@ -105,7 +105,11 @@ plot_bar(ps.16s, fill="Species")
 ps.16s = tax_glom(ps.16s, "Species", NArm = FALSE)
 
 # Plots stacked bar plot of abundance - to confirm presence of NA's
-plot_bar(ps.16s, fill="Species")
+abs <- plot_bar(ps.16s, fill="Species")
+
+# Saves absolute abundance plot
+ggsave("Deliverables/Plate1/ABSOLUTE.png", plot = abs, width = 16, height = 8, units = "in", dpi = 300)
+
 
 # Calculates relative abundance of each species 
 ## Transforms NaN (0/0) to 0
