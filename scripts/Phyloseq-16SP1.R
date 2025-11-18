@@ -19,45 +19,29 @@ library(tidyverse)
 library(dplyr)
 library(tibble)
 
+# ------------------------------------------------------------------
+# Loads in Data
+# ------------------------------------------------------------------
 
 # Loads dada2 output
 #load("C:/Users/MBall/OneDrive/文档/WADE LAB/Arctic-predator-diet-microbiome/DADA2/DADA2 Outputs/WADE003-arcticpred_dada2_QAQC_16SP2_output.Rdata")
 load("DADA2/DADA2 Outputs/SRKW-diet-16SP1.Rdata")
 
-# Removes file extensions from OTU table names
-#### NEED TO CHANGE TO WHAT OUR SAMPLE NAMES ARE!!
-
-
-rownames(seqtab.nochim) <- sub("^((WADE-003-\\d+|WADE-003-\\d+-C|WADE-003-\\d+-UC))_.*", "\\1", rownames(seqtab.nochim))
-rownames(seqtab.nochim) <- gsub("-16S_S\\d+", "", rownames(seqtab.nochim))
-
 # Gets sample metadata
-labdf <- read.csv("metadata/ADFG_dDNA_labwork_metadata.csv")
+samdf <- read.csv("metadata/SRKW_Diet_Plate1_MetaData.csv")
 
-samdf <- read.csv("metadata/ADFG_dDNA_sample_metadata.csv")
-
-# Renames "species" column to "Predator"
-samdf <- dplyr::rename(samdf, Predator = Species)
-
-# Creates a column corresponding ADFG sample IDs with WADE sample IDs
-samdf <- samdf %>%
-  left_join(
-    labdf %>% 
-      select(Specimen.ID, Repeat.or.New.Specimen., LabID),
-    by = c("Specimen.ID", "Repeat.or.New.Specimen.")
-  )
-
-# Removes rows where LabID is NA (because shipment 1 was bad & thus not extracted)
-samdf <- samdf[!is.na(samdf$LabID), ]
+# ------------------------------------------------------------------
+# Ensures rownames are the same
+# ------------------------------------------------------------------
 
 # Sets row names to LabID
-rownames(samdf) <- samdf$LabID
+rownames(samdf) <- samdf$Sample_name
 
-# Only keeps rows that appear in both metadata and seq.tab 
-## AKA only samples that made it through all steps 
-common_ids <- intersect(rownames(samdf), rownames(seqtab.nochim))
-samdf <- samdf[common_ids, ]
-seqtab.nochim <- seqtab.nochim[common_ids, ]
+# Replaces all dashes with underscores for consistency
+rownames(seqtab.nochim) <- gsub("-", "_", rownames(seqtab.nochim))
+
+## TREATS AS THE SAME SAMPLE!! MIGHT NOT BE TRUE!!!!!!
+rownames(seqtab.nochim) <- sub("F22SEP06_01C_2_S45", "F22SEP06_01C_S45", rownames(seqtab.nochim))
 
 # Checks for identical sample rownames in both
 any(duplicated(rownames(samdf)))
@@ -72,12 +56,6 @@ setdiff(rownames(samdf), rownames(seqtab.nochim))
 # Samples in OTU table but not in metadata
 setdiff(rownames(seqtab.nochim), rownames(samdf))
 
-sample_to_remove <- "WADE-003-118-C"
-
-# Remove from metadata and OTU table early
-samdf <- samdf[!rownames(samdf) %in% sample_to_remove, ]
-seqtab.nochim <- seqtab.nochim[!rownames(seqtab.nochim) %in% sample_to_remove, ]
-
 # Sanity check: row names are the same
 rownames(samdf)
 rownames(seqtab.nochim)
@@ -85,7 +63,7 @@ rownames(seqtab.nochim)
 # Creates master phyloseq object
 ps.16s <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE), 
                    sample_data(samdf), 
-                   tax_table(merged.taxa))
+                   tax_table(taxa))
 
 # Creates a dataframe that maps ADFG IDs to sequences in taxa
 
@@ -101,29 +79,6 @@ seqtab_long <- seqtab_long %>%
   ) %>%
   filter(Abundance > 0)   # Keep only entries where the sequence is present in the sample
 
-## Keeps only the Sequence and WADE_ID columns
-mapped.sequences <- seqtab_long[, c("Sequence", "WADE_ID")]
-
-# Turns rownames into a column for joining to mapped.sequences
-mapped.sequences <- mapped.sequences %>%
-  left_join(
-    samdf %>% rownames_to_column("WADE_ID") %>% select(WADE_ID, Specimen.ID),
-    by = "WADE_ID"
-  )
-
-mapped.taxa <- as.data.frame(merged.taxa)
-
-# Add Sequence as a column from the row names
-mapped.taxa$Sequence <- rownames(mapped.taxa)
-
-# Merge with mapped.taxa to add ADFG_ID for each Sequence
-mapped.taxa <- merge(mapped.taxa, mapped.sequences[, c("Sequence", "Specimen.ID")], by = "Sequence", all.x = TRUE)
-
-# Reorders columns to put Sequence and ADFG_ID first
-other_cols <- setdiff(names(mapped.taxa), c("Sequence", "Specimen.ID"))
-mapped.taxa <- mapped.taxa[, c("Sequence", "Specimen.ID", other_cols)]
-
-
 ### shorten ASV seq names, store sequences as reference
 dna <- Biostrings::DNAStringSet(taxa_names(ps.16s))
 names(dna) <- taxa_names(ps.16s)
@@ -135,29 +90,22 @@ nsamples(ps.16s)
 # Filters out any Mammalia and NA
 ps.16s <- subset_taxa(ps.16s, Class!="Mammalia")
 ps.16s <- subset_taxa(ps.16s, Kingdom!="Bacteria")
-#ps.16s <- prune_samples(sample_sums(ps.16s) > 0, ps.16s)
-#ps.16s <- subset_taxa(ps.16s, !is.na(Species))
-
-
-#sample 146 removed; need to remove from samdf
-row_to_remove <- "WADE-003-146"
-samdf <- samdf[!rownames(samdf) %in% row_to_remove, ]
 
 # Remove samples with total abundance == 0
 ps.16s <- prune_samples(sample_sums(ps.16s) > 0, ps.16s)
 
 # Saves phyloseq obj
-saveRDS(ps.16s, "ps.16s")
+saveRDS(ps.16s, "srkw-ps.16s")
 
 
 # Plots stacked bar plot of abundance - to confirm presence of NA's
-plot_bar(ps.16s, fill="Species.y")
+plot_bar(ps.16s, fill="Species")
 
 ## MERGE TO SPECIES HERE (TAX GLOM)
-ps.16s = tax_glom(ps.16s, "Species.y", NArm = FALSE)
+ps.16s = tax_glom(ps.16s, "Species", NArm = FALSE)
 
 # Plots stacked bar plot of abundance - to confirm presence of NA's
-plot_bar(ps.16s, fill="Species.y")
+plot_bar(ps.16s, fill="Species")
 
 # Calculates relative abundance of each species 
 ## Transforms NaN (0/0) to 0
@@ -170,80 +118,109 @@ ps16s.rel <- transform_sample_counts(ps.16s, function(x) {
 #Checks for NaN's 
 which(is.nan(as.matrix(otu_table(ps16s.rel))), arr.ind = TRUE)
 
-# Creates a label map (WADE ID = ADFG ID)
-label_map <- sample_data(ps16s.rel)$Specimen.ID
-names(label_map) <- rownames(sample_data(ps16s.rel))
-
 # ------------------------------------------------------------------
-# PLOTS
+# PLOTS RELATIVE ABUNDANCE
 # ------------------------------------------------------------------
 # Creates bar plot of relative abundance
 
 # Plots with WADE IDs
-sp.rel.plot <- plot_bar(ps16s.rel, fill="Species.y")+
+sp.rel.plot <- plot_bar(ps16s.rel, fill="Species")+
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 sp.rel.plot
 
-# Plots with ADFG IDs
-ADFG.sp<- sp.rel.plot +
-  scale_x_discrete(labels = label_map) +
-  labs(x = "ADFG ID")
-ADFG.sp
-
-gen.rel.plot <- plot_bar(ps16s.rel, fill="Genus.y")+
+gen.rel.plot <- plot_bar(ps16s.rel, fill="Genus")+
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 gen.rel.plot
-
-ADFG.gen<- gen.rel.plot + 
-  scale_x_discrete(labels = label_map) +
-  labs(x = "ADFG ID")
-ADFG.gen
 
 fam.rel.plot <- plot_bar(ps16s.rel, fill="Family")+
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 fam.rel.plot
 
-ADFG.fam <- fam.rel.plot + 
-  scale_x_discrete(labels = label_map) +
-  labs(x = "ADFG ID")
-ADFG.fam
+#saves plots 
+ggsave("Deliverables/srkw-species.png", plot = sp.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
 
-# Facet wrapped by predator species
-### I WANT BOXES AROUND THE DIFFERENT FACETS
-faucet <- plot_bar(ps16s.rel, fill = "Species.y") +
-  facet_wrap(~ Predator, ncol = 1, scales = "free_x", strip.position = "right") +
+ggsave("Deliverables/srkw-genus.png", plot = gen.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
+
+ggsave("Deliverables/srkw-family.png", plot = fam.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
+
+# ------------------------------------------------------------------
+# FORMATS DATA AND PLOTS RELATIVE ABUNDANCE BY PRE OR POST HORMONE ANALYSIS
+# ------------------------------------------------------------------
+
+# Ensure sample_data is a data frame and ID columns as character
+hormone <- as(sample_data(ps.16s), "data.frame")
+hormone$ID <- as.character(hormone$ID)
+hormone$Pre.Post_hormone <- as.character(hormone$Pre.Post_hormone)
+hormone$Sample_name <- as.character(hormone$Sample_name)
+
+# Specify your chosen sample names explicitly
+samples_to_keep <- c("F24MAY27_02A_S11",
+                     "F24MAY27_02A_Post_S12",
+                     "F24JUN01_01C_S14",
+                     "F24JUN01_01C_Post_S15",
+                     "F24OCT29_06B_S20",
+                     "F24OCT29_06B_Post_S21",
+                     "06Oct2024_3_S25",
+                     "06Oct2024_3_Post_S26")
+
+# Prune phyloseq object to retain only these samples
+ps16s.abs.filtered <- prune_samples(samples_to_keep, ps.16s)
+
+# Plot with nicer x labels
+faucet.abs <- plot_bar(ps16s.abs.filtered, fill = "Species") +
+  facet_wrap(~ Pre.Post_hormone, ncol = 1, scales = "free_x", strip.position = "right") +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
     strip.background = element_blank(),
     strip.placement = "outside",
     panel.spacing = unit(0.5, "lines"),
     axis.title.x = element_text(margin = margin(t = 10))
-  ) 
+  )
 
-ADFG.faucet <- faucet+
-  scale_x_discrete(labels = label_map) +
-  labs(x = "ADFG ID")+
-  guides(fill = guide_legend(title = "Species"))
+faucet.abs
+
+# Ensure sample_data is a data frame and ID columns as character
+hormone <- as(sample_data(ps16s.rel), "data.frame")
+hormone$ID <- as.character(hormone$ID)
+hormone$Pre.Post_hormone <- as.character(hormone$Pre.Post_hormone)
+hormone$Sample_name <- as.character(hormone$Sample_name)
+
+# Specify your chosen sample names explicitly
+samples_to_keep <- c("F24MAY27_02A_S11",
+                     "F24MAY27_02A_Post_S12",
+                     "F24JUN01_01C_S14",
+                     "F24JUN01_01C_Post_S15",
+                     "F24OCT29_06B_S20",
+                     "F24OCT29_06B_Post_S21",
+                     "06Oct2024_3_S25",
+                     "06Oct2024_3_Post_S26")
+
+# Prune phyloseq object to retain only these samples
+ps16s.filtered <- prune_samples(samples_to_keep, ps16s.rel)
+
+# Plot with nicer x labels
+faucet <- plot_bar(ps16s.filtered, fill = "Species") +
+  facet_wrap(~ Pre.Post_hormone, ncol = 1, scales = "free_x", strip.position = "right") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    panel.spacing = unit(0.5, "lines"),
+    axis.title.x = element_text(margin = margin(t = 10))
+  )
+
+faucet
 
 
-ADFG.faucet
 
 #saves plots 
-ggsave("Deliverables/16S/16S-species.png", plot = sp.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
-ggsave("Deliverables/16S/ADFG-16S-species.png", plot = ADFG.sp, width = 16, height = 8, units = "in", dpi = 300)
-
-ggsave("Deliverables/16S/16S-genus.png", plot = gen.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
-ggsave("Deliverables/16S/ADFG-16S-genus.png", plot = ADFG.gen, width = 16, height = 8, units = "in", dpi = 300)
-
-ggsave("Deliverables/16S/16S-family.png", plot = fam.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
-ggsave("Deliverables/16S/ADFG-16S-family.png", plot = ADFG.fam, width = 16, height = 8, units = "in", dpi = 300)
-
-ggsave("Deliverables/16S/16S-species-by-pred.111125.png", plot = faucet, width = 16, height = 8, units = "in", dpi = 300)
-ggsave("Deliverables/16S/ADFG-16S-species-by-pred.111125.png", plot = ADFG.faucet, width = 16, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/srkw-pre-post-hormone.relative.png", plot = faucet, width = 16, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/srkw-pre-post-hormone.absolute.png", plot = faucet.abs, width = 16, height = 8, units = "in", dpi = 300)
 
 # ------------------------------------------------------------------
 # TABLES
