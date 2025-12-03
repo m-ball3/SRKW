@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------
 
 ## Sets Working Directory
-setwd("Arctic-predator-diet-microbiome/DADA2/DADA2 Outputs")
+#setwd("Arctic-predator-diet-microbiome/DADA2/DADA2 Outputs")
 
 ## Sets up the Environment and Libraries
 
@@ -30,6 +30,14 @@ load("DADA2/DADA2 Outputs/Plate1/SRKW-diet-16SP1.Rdata")
 # Gets sample metadata
 samdf <- read.csv("metadata/Plate1/SRKW_Diet_Plate1_MetaData.csv")
 
+# Creates pod column from ID column
+samdf <- samdf %>%
+  mutate(pod = case_when(
+    grepl("^J", ID) ~ "J",
+    grepl("^K", ID) ~ "K",
+    grepl("^L", ID) ~ "L",
+    TRUE            ~ NA_character_
+  ))
 # ------------------------------------------------------------------
 # Ensures rownames are the same
 # ------------------------------------------------------------------
@@ -225,6 +233,32 @@ faucet
 #saves plots 
 ggsave("Deliverables/Plate1/srkw-pre-post-hormone.relative.png", plot = faucet, width = 16, height = 8, units = "in", dpi = 300)
 ggsave("Deliverables/Plate1/srkw-pre-post-hormone.absolute.png", plot = faucet.abs, width = 16, height = 8, units = "in", dpi = 300)
+
+
+# ------------------------------------------------------------------
+# PREY ANALYSIS BY POD
+# ------------------------------------------------------------------
+
+# plots fauceted plot by pod
+by.pod <- plot_bar(ps16s.rel, fill = "Species") +
+  facet_wrap(~ pod, ncol = 4, scales = "free_x", strip.position = "top") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),  # Removes x-axis sample names
+    strip.text = element_text(size = 24),
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    panel.spacing = unit(0.5, "lines"),
+    axis.title.x = element_text(margin = margin(t = 10), size = 24),
+    axis.title.y = element_text(size = 24),
+    axis.text.y = element_text(size = 24)
+  )
+
+by.pod
+
+
+
+ggsave("Deliverables/Plate1/srkw-by.podabsolute.png", plot = by.pod, width = 20, height = 8, units = "in", dpi = 300)
 
 # ------------------------------------------------------------------
 # TABLES
