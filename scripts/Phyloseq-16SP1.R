@@ -94,6 +94,16 @@ ps.16s <- subset_taxa(ps.16s, Kingdom!="Bacteria")
 # Remove samples with total abundance == 0
 ps.16s <- prune_samples(sample_sums(ps.16s) > 0, ps.16s)
 
+# Filtering to remove taxa with less than 1% of reads assigned in at least 1 sample.
+f1 <- filterfun_sample(function(x) x / sum(x) > 0.01)
+lowcount.filt <- genefilter_sample(ps.16s, f1, A=1)
+ps.16s.filt <- prune_taxa(lowcount.filt, ps.16s)
+
+# must be at least 1% of diet in 4 or more samples
+f1 <- filterfun_sample(function(x) x >= 0.01)
+lowcount.filt <- genefilter_sample(ps.16s, f1, A=4)
+ps.16s.major <- prune_taxa(lowcount.filt, ps.16s)
+
 # Saves phyloseq obj
 saveRDS(ps.16s, "srkw-ps.16s")
 
