@@ -1,8 +1,11 @@
+# log in
+ssh mball3@klone.hyak.uw.edu
+
 # ------------------------------------------------------------------
 # Uploads .fastq files to HYAK (need to be in the folder containing the files)
 # ------------------------------------------------------------------
-
-scp -r * mball3@klone.hyak.uw.edu:/gscratch/coenv/mball3/SRKW/rawdata/16SP1/
+# navigate to monodon first!
+scp -r * mball3@klone.hyak.uw.edu:/gscratch/coenv/mball3/SRKW/rawdata/16SP2/
 
 # ------------------------------------------------------------------
 # Uploads reference Db to HYAK
@@ -20,7 +23,7 @@ scp -r * mball3@klone.hyak.uw.edu:/gscratch/coenv/mball3/SRKW/rawdata/16SP1/
 # ------------------------------------------------------------------
 
 #16S
-scp -r "mball3@klone.hyak.uw.edu:/mmfs1/home/mball3/SRKW-diet-16SP1.Rdata" "C:/Users/Intern/SRKW/DADA2/DADA2 Outputs"
+scp -r "mball3@klone.hyak.uw.edu:/mmfs1/home/mball3/SRKW-diet-16SP2.Rdata" "C:/Users/MBall/OneDrive/文档/WADE LAB/SRKW/DADA2/DADA2 Outputs"
 
 
 
