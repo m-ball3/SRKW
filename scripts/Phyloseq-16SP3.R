@@ -2,9 +2,6 @@
 # FROM DADA2 TO PHYLOSEQ
 # ------------------------------------------------------------------
 
-## Sets Working Directory
-setwd("Arctic-predator-diet-microbiome/DADA2/DADA2 Outputs")
-
 ## Sets up the Environment and Libraries
 
 # if(!requireNamespace("BiocManager")){
@@ -150,6 +147,21 @@ fam.rel.plot <- plot_bar(ps16s.rel, fill="Family")+
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 fam.rel.plot
 
+
+pod.faucet <- plot_bar(ps16s.rel, x = "Sample_ID", fill = "Species") +
+  facet_wrap(~pod, ncol = 1, scales = "free_x", strip.position = "right") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.title.x = element_blank(),  # Remove duplicate below
+    axis.ticks.x = element_blank(),
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    panel.spacing = unit(0.5, "lines")
+  )
+pod.faucet
+
+
 #saves plots 
 ggsave("Deliverables/Plate3/srkw-species.png", plot = sp.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
 
@@ -157,6 +169,7 @@ ggsave("Deliverables/Plate3/srkw-genus.png", plot = gen.rel.plot, width = 16, he
 
 ggsave("Deliverables/Plate3/srkw-family.png", plot = fam.rel.plot, width = 16, height = 8, units = "in", dpi = 300)
 
+ggsave("Deliverables/Plate3/srkw-sp-bypod.png, plot = pod.faucet, width = 16, height = 8, units = "in", dpi = 300)")
 # ------------------------------------------------------------------
 # TABLES
 # ------------------------------------------------------------------
