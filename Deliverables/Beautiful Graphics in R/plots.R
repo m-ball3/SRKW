@@ -10,6 +10,7 @@ library(patchwork)
 library(ggh4x)
 
 ## Load phyloseq object for all plates ----
+ps.16s     <- readRDS("srkw-ps.16s")
 ps.16s     <- readRDS("srkw-ps.16s.allplates")
 
 

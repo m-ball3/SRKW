@@ -96,6 +96,7 @@ taxa_names(ps.16s) <- paste0("ASV", seq(ntaxa(ps.16s)))
 nsamples(ps.16s)
 
 # Filters out any Mammalia and NA
+# CHANGE TO FILTER ANYTHING THAT ISN'T ACTINOPTERI  
 ps.16s <- subset_taxa(ps.16s, Class!="Mammalia")
 ps.16s <- subset_taxa(ps.16s, Kingdom!="Bacteria")
 

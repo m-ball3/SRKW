@@ -27,6 +27,14 @@ load("DADA2/DADA2 Outputs/Plate3/SRKW-diet-16SP3.Rdata")
 # Gets sample metadata
 samdf <- read.csv("metadata/Plate3/SRKW_Diet_Meta_Plate3.csv")
 
+# Creates pod column from ID column
+samdf <- samdf %>%
+  mutate(pod = case_when(
+    grepl("^J", ID) ~ "J",
+    grepl("^K", ID) ~ "K",
+    grepl("^L", ID) ~ "L",
+    TRUE            ~ NA_character_
+  ))
 # ------------------------------------------------------------------
 # Ensures rownames are the same
 # ------------------------------------------------------------------
@@ -86,6 +94,7 @@ taxa_names(ps.16s) <- paste0("ASV", seq(ntaxa(ps.16s)))
 nsamples(ps.16s)
 
 # Filters out any Mammalia and NA
+# CHANGE TO FILTER ANYTHING THAT ISN'T ACTINOPTERI
 ps.16s <- subset_taxa(ps.16s, Class!="Mammalia")
 ps.16s <- subset_taxa(ps.16s, Kingdom!="Bacteria")
 
