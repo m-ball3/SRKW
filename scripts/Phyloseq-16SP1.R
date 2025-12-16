@@ -96,6 +96,7 @@ taxa_names(ps.16s) <- paste0("ASV", seq(ntaxa(ps.16s)))
 nsamples(ps.16s)
 
 # Filters out any Mammalia and NA
+# CHANGE TO FILTER ANYTHING THAT ISN'T ACTINOPTERI  
 ps.16s <- subset_taxa(ps.16s, Class!="Mammalia")
 ps.16s <- subset_taxa(ps.16s, Kingdom!="Bacteria")
 
@@ -113,7 +114,7 @@ lowcount.filt <- genefilter_sample(ps.16s, f1, A=4)
 ps.16s.major <- prune_taxa(lowcount.filt, ps.16s)
 
 # Saves phyloseq obj
-saveRDS(ps.16s, "srkw-ps.16s")
+saveRDS(ps.16s, "srkw-ps.16s.p1")
 
 
 # Plots stacked bar plot of abundance - to confirm presence of NA's
@@ -160,6 +161,21 @@ fam.rel.plot <- plot_bar(ps16s.rel, fill="Family")+
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 fam.rel.plot
+
+
+pod.faucet <- plot_bar(ps16s.rel, x = "Sample_name", fill = "Species") +
+  facet_wrap(~pod, ncol = 1, scales = "free_x", strip.position = "right") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.title.x = element_blank(),  # Remove duplicate below
+    axis.ticks.x = element_blank(),
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    panel.spacing = unit(0.5, "lines")
+  )
+pod.faucet
+
 
 #saves plots 
 ggsave("Deliverables/Plate1/srkw-species.png", plot = sp.rel.plot, width = 16, height = 8, units = "in", dpi = 300)

@@ -9,8 +9,10 @@ library(RColorBrewer)
 library(patchwork)
 library(ggh4x)
 
-## Load phyloseq objects ----
-ps.16s      <- readRDS("srkw-ps.16s")
+## Load phyloseq object for all plates ----
+ps.16s     <- readRDS("srkw-ps.16s")
+ps.16s     <- readRDS("srkw-ps.16s.allplates")
+
 
 # names to drop
 control.neg <- c("NegCon_S44", "PosCon_S43")
