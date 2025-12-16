@@ -112,7 +112,7 @@ lowcount.filt <- genefilter_sample(ps.16s, f1, A=4)
 ps.16s.major <- prune_taxa(lowcount.filt, ps.16s)
 
 # Saves phyloseq obj
-saveRDS(ps.16s, "srkw-ps.16s")
+saveRDS(ps.16s, "srkw-ps.16s.p3")
 
 
 # Plots stacked bar plot of abundance - to confirm presence of NA's
