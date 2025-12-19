@@ -6,12 +6,11 @@
 
 # loads in environment
 
-if(!requireNamespace("BiocManager")){
-  install.packages("BiocManager")
-}
-BiocManager::install("phyloseq")
+devtools::install_github("benjjneb/dada2", ref="v1.16", lib = .libPaths()[1])
+BiocManager::install("dada2", lib = .libPaths()[1], force = TRUE)
+BiocManager::install("S4Vectors")
 
-library(phyloseq); packageVersion("phyloseq")
+library(dada2)
 library(tidyverse)
 
 # lOADS IN TAXONOMY REFERENCE FILES
@@ -35,7 +34,7 @@ taxa <- assignTaxonomy(seqtab.nochim, taxref, tryRC = TRUE, minBoot = 95)
 # SAVE DATA
 
 # OVERWRITES P1 DADA2 OUTPUT
-save(seqtab.nochim, freq.nochim, track, taxa, tax_table, file = "DADA2/DADA2 Outputs/Plate1/SRKW-diet-16SP1.Rdata")
+save(seqtab.nochim, freq.nochim, track, taxa, file = "DADA2/DADA2 Outputs/Plate1/SRKW-diet-16SP1.Rdata")
 
 # OVERWRITES P3 DADA2 OUTPUT
 # save(seqtab.nochim, freq.nochim, track, taxa, tax_table, file = "DADA2/DADA2 Outputs/Plate3/SRKW-diet-16SP3.Rdata")
