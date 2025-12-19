@@ -164,7 +164,7 @@ fam.rel.plot
 
 
 pod.faucet <- plot_bar(ps16s.rel, x = "Sample_name", fill = "Species") +
-  facet_wrap(~pod, ncol = 1, scales = "free_x", strip.position = "right") +
+  facet_wrap(~pod, ncol = 4, scales = "free_x", strip.position = "right") +
   theme_minimal() +
   theme(
     axis.text.x = element_blank(),
