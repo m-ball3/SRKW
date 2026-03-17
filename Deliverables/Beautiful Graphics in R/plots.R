@@ -10,36 +10,37 @@ library(patchwork)
 library(ggh4x)
 
 ## Load phyloseq object for all plates ----
-ps.16s     <- readRDS("srkw-ps.16s")
-ps.16s     <- readRDS("srkw-ps.16s.allplates")
+load("C:/Users/MBall/OneDrive - UW/Documents/WADE LAB/SRKW/SRKW-diet-16SALL.Rdata")
 
 
-# names to drop
-control.neg <- c("NegCon_S44", "PosCon_S43")
+# # names to drop
+# control.neg <- c("NegCon_S44", "PosCon_S43")
+# # 
+# # # for 16S
+# ps.16s <- prune_samples(!(sample_names(ps.16s) %in% control.neg), ps.16s)
+# 
+# ## 12S preprocessing for FACET plot ----
+# ps.16s <- tax_glom(ps.16s, "Species", NArm = FALSE)
+# ps.16s <- subset_taxa(ps.16s, Class == "Actinopteri")
+# ps.16s <- prune_samples(sample_sums(ps.16s) >= 100, ps.16s)
+# 
+# ps16s.rel <- transform_sample_counts(ps.16s, function(x) {
+#   x_rel <- x / sum(x)
+#   x_rel[is.nan(x_rel)] <- 0
+#   x_rel
+# })
 
-# for 16S
-ps.16s <- prune_samples(!(sample_names(ps.16s) %in% control.neg), ps.16s)
-
-## 12S preprocessing for FACET plot ----
-ps.16s <- tax_glom(ps.16s, "Species", NArm = FALSE)
-ps.16s <- subset_taxa(ps.16s, Class == "Actinopteri")
-ps.16s <- prune_samples(sample_sums(ps.16s) >= 100, ps.16s)
-
-ps16s.rel <- transform_sample_counts(ps.16s, function(x) {
-  x_rel <- x / sum(x)
-  x_rel[is.nan(x_rel)] <- 0
-  x_rel
-})
-
-## Family palette for barplot ----
+## Family palette for barplot (23+ colors) ----
 families_16s  <- sort(unique(as.character(tax_table(ps16s.rel)[, "Species"])))
 n_fam_16s     <- length(families_16s)
 palette_fam_16s <- rep(
-  c(brewer.pal(4,"Pastel2"),
-    brewer.pal(8,"Paired")),
+  c(brewer.pal(8, "Dark2"),      # 1-8: Bold high-contrast (turquoise/orange/purple/etc)
+    brewer.pal(8, "Set2"),       # 9-16: Clean midtones (no overlap w/ Dark2)
+    brewer.pal(8, "Set3")[1:7]), # 17-23: Muted variety (light blue/brown/pink)
   length.out = n_fam_16s
 )
 names(palette_fam_16s) <- families_16s
+
 
 ## Pod color palette (analogous to predator_colors) ----
 pod_colors <- c(
@@ -109,7 +110,7 @@ metadata$SampleID <- rownames(metadata)
 
 plot_data <- left_join(nmds_scores, metadata, by = "SampleID")
 
-nmds.16 <- ggplot(plot_data, aes(x = MDS1, y = MDS2, color = pod)) +
+nmds.16 <- ggplot(plot_data, aes(x = (log(MDS1)+1), y = (log(MDS2)+1), color = pod)) +
   stat_ellipse(
     aes(group = pod, color = pod),  # outline only, by pod
     level = 0.95,
@@ -138,15 +139,45 @@ nmds.16
 ## 12S FACET barplot by Pod (family-level) ----
 pod_levels <- levels(sample_data(ps16s.rel)$pod)
 
-# make sure this is run once
-library(ggh4x)
+
+
 
 pod_levels <- levels(sample_data(ps16s.rel)$pod)
 faucet.16s <- plot_bar(ps16s.rel, fill = "Species") +
   scale_fill_manual(values = palette_fam_16s) +
   facet_wrap(
     ~ pod,
-    nrow   = 1,
+    nrow   = 2,
+    scales = "free_x"
+  ) +
+  theme_minimal(base_size = 18) +
+  theme(
+    #axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    axis.title.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.text.y  = element_text(size = 25, color = "grey60"),
+    axis.title.y = element_text(size = 25, color = "grey40"),
+    axis.line.y  = element_line(color = "grey80"),
+    axis.ticks.y = element_line(color = "grey80"),
+    strip.text   = element_text(size = 25, face = "bold", colour = "black"),
+    legend.title = element_text(size = 25),
+    legend.text  = element_text(size = 25),
+    legend.position = "bottom",
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  theme(legend.position = "bottom")
+
+faucet.16s
+
+pod_levels <- levels(sample_data(ps16s.rel)$pod)
+faucet.16s <- plot_bar(ps16s.rel, fill = "Species") +
+  scale_fill_manual(values = palette_fam_16s) +
+  facet_wrap(
+    ~ pod,
+    nrow   = 2,
     scales = "free_x"
   ) +
   theme_minimal(base_size = 18) +
@@ -156,13 +187,13 @@ faucet.16s <- plot_bar(ps16s.rel, fill = "Species") +
     axis.ticks.x = element_blank(),
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank(),
-    axis.text.y  = element_text(size = 14, color = "grey60"),
-    axis.title.y = element_text(size = 18, color = "grey40"),
+    axis.text.y  = element_text(size = 30, color = "grey60"),
+    axis.title.y = element_text(size = 30, color = "grey40"),
     axis.line.y  = element_line(color = "grey80"),
     axis.ticks.y = element_line(color = "grey80"),
-    strip.text   = element_text(size = 16, face = "bold", colour = "black"),
-    legend.title = element_text(size = 16),
-    legend.text  = element_text(size = 14),
+    strip.text   = element_text(size = 30, face = "bold", colour = "black"),
+    legend.title = element_text(size = 30),
+    legend.text  = element_text(size = 30),
     legend.position = "bottom",
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank()
@@ -178,11 +209,23 @@ final_top <- (div.16 + nmds.16) +
   theme(legend.position = "bottom")
 
 final_srkw <- final_top / faucet.16s
+final_srkw
 
 ggsave(
-  filename = "./Deliverables/Beautiful Graphics in R/final_patchwork_16sp1_SRWK.png",
+  filename = "./Deliverables/Beautiful Graphics in R/final_patchwork_16sALL_SRWK.png",
   plot     = final_srkw,
-  width    = 22,
+  width    = 30,
+  height   = 16,
+  dpi      = 350,
+  units    = "in",
+  bg       = "white"
+)
+
+
+ggsave(
+  filename = "./Deliverables/Beautiful Graphics in R/FaucetbypodALL_SRWK.png",
+  plot     = faucet.16s,
+  width    = 48,
   height   = 16,
   dpi      = 350,
   units    = "in",
