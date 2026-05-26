@@ -1,0 +1,43 @@
+<DocumentSummary uid="1068648">
+    <Project>
+        <ProjectID>
+            <ArchiveID accession="PRJNA1068648" archive="NCBI" id="1068648"/>
+            <LocalID>bp0</LocalID>
+            <LocalID>bp0</LocalID>
+        </ProjectID>
+        <ProjectDescr>
+            <Title>Characterization of NPac resident killer whale diet via fecal 16W metabarcoding</Title>
+            <Description>Highly social top marine predators, including many cetaceans, exhibit culturally learned ecological behaviours such as diet preference and foraging strategy that can affect their resilience to competition or anthropogenic impacts. When these species are also endangered, conservation efforts require adaptive management strategies based on a comprehensive understanding of the variability in these behaviours. In the northeast Pacific Ocean, three partially sympatric populations of resident killer whales occupy coastal ecosystems from California to Alaska. One population (southern resident killer whales) is endangered while another (southern Alaska resident killer whales) has exhibited positive abundance trends for the last several decades. Using 185 fecal samples collected from both populations between 2011 and 2021, we compare spatiotemporal and social variability in diet preference to provide insight into differences in foraging patterns that may be linked with the relative success and decline of these populations. We find broad similarity in the diet of the two populations, with differences arising from spatiotemporal and social variability in resource use patterns, especially in the timing of shifts between target prey species. The results described here highlight the importance of comprehensive longitudinal monitoring of foraging ecology to inform adaptive management strategies for endangered, highly social top marine predators.</Description>
+            <Relevance>
+                <Environmental>yes</Environmental>
+            </Relevance>
+        </ProjectDescr>
+        <ProjectType>
+            <ProjectTypeSubmission>
+                <Target capture="eWhole" material="eGenome" sample_scope="eMultispecies"/>
+                <Method method_type="eSequencing"/>
+                <Objectives>
+                    <Data data_type="eRawSequenceReads"/>
+                </Objectives>
+                <IntendedDataTypeSet>
+                    <DataType>raw sequence reads</DataType>
+                </IntendedDataTypeSet>
+                <ProjectDataTypeSet>
+                    <DataType>raw sequence reads</DataType>
+                </ProjectDataTypeSet>
+            </ProjectTypeSubmission>
+        </ProjectType>
+    </Project>
+    <Submission last_update="2024-01-24" submission_id="SUB14165923" submitted="2024-01-24">
+        <Description>
+            <!-- Submitter information has been removed -->
+            <Organization role="owner" type="institute" url="https://www.fisheries.noaa.gov/about/northwest-fisheries-science-center">
+                <Name>NOAA Northwest Fisheries Science Center</Name>
+                <!-- Contact information has been removed -->
+            </Organization>
+            <Access>public</Access>
+        </Description>
+        <Action action_id="SUB14165923-bp0"/>
+    </Submission>
+</DocumentSummary>
+

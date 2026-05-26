@@ -7,18 +7,23 @@ ssh mball3@klone.hyak.uw.edu
 # navigate to monodon first!
 scp -r * mball3@klone.hyak.uw.edu:/gscratch/coenv/mball3/SRKW/rawdata/ALL/
 
+  
+  # PRJNA1068648
+  scp -r "C:/Users/MBall/OneDrive - UW/Documents/WADE LAB/SRKW/PRJNA1068648/sra_metadata_with_paths.csv" mball3@klone.hyak.uw.edu:/gscratch/coenv/mball3/SRKW/2024
+  
 # ------------------------------------------------------------------
 # Uploads reference Db to HYAK
 # ------------------------------------------------------------------
 
   # 16S
-  scp -r "C:/Users/MBall/OneDrive - UW/Documents/WADE LAB/SRKW//DADA2/Ref-DB/16S_salmon_groundfish_reference_database_2022.fasta" mball3@klone.hyak.uw.edu:/gscratch/coenv/mball3/SRKW/
+  scp -r "C:/Users/MBall/OneDrive - UW/Documents/WADE LAB/SRKW/DADA2/Ref-DB/16S_salmon_groundfish_reference_database_2022.fasta" mball3@klone.hyak.uw.edu:/gscratch/coenv/mball3/SRKW/
   scp -r "C:/Users/Intern/SRKW/DADA2/Ref-DB/SRKW-16S-AddSpecies_11-25.fasta" mball3@klone.hyak.uw.edu:/gscratch/coenv/mball3/SRKW/
   
   # scp -r "C:/Users/MBall/OneDrive/文档/WADE LAB/Arctic-predator-diet-microbiome/DADA2/Ref-DB/16S_Arctic_predator_reference_database_07_2025.fasta" mball3@klone.hyak.uw.edu:/gscratch/coenv/mball3/WADE003-arctic-pred/
   # scp -r "C:/Users/MBall/OneDrive/文档/WADE LAB/Arctic-predator-diet-microbiome/DADA2/Ref-DB/16S-AddSpecies_11-25.fasta" mball3@klone.hyak.uw.edu:/gscratch/coenv/mball3/WADE003-arctic-pred/
-  # 
-  # ------------------------------------------------------------------
+  
+  
+# ------------------------------------------------------------------
 # Gets output from HYAK
 # ------------------------------------------------------------------
 

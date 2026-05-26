@@ -1,0 +1,86 @@
+---
+title: "SRKW-QERM514"
+author: "Mollie Ball"
+date: "2026-05-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+INFORMATION ABOUT THE DATASET SHOULD GO HERE:
+
+```{r Loads in Data}
+getwd()
+# LOADS IN PHYLOSEQ AND OTHER RDATA OBJECTS FOR SRKW PROJECT
+# includes reads that are at least 1% of diet in 4 or more samples
+load("SRKW-diet-MAJOR-16SALL.Rdata")
+
+```
+
+
+WHY DO THEY NEED TO BE RELATIVE ABUNDANCE AND NOT ABSOLUTE ABUNDANCE?
+```{r Calculates relative abundance}
+# Calculates relative abundance of each species 
+## Transforms NaN (0/0) to 0
+ps.16s.major.rel <- transform_sample_counts(ps.16s.major, function(x) {
+  x_rel <- x / sum(x)
+  x_rel[is.nan(x_rel)] <- 0
+  return(x_rel)
+})
+```
+
+I WANT TO LOOK AT THE PERCENT OF CHINOOK IN THE DIET ACROSS DIFFERENT PREDICTOR VARIABLES
+SEASON
+AGE CLASS
+SEX
+POD
+YEAR
+
+```{r Creates new df}
+# Calculates relative abundance of each species 
+## Transforms NaN (0/0) to 0
+ps.16s.major.rel <- transform_sample_counts(ps.16s.major, function(x) {
+  x_rel <- x / sum(x)
+  x_rel[is.nan(x_rel)] <- 0
+  return(x_rel)
+})
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r Shannon Diversity by Pod}
+pr16s_data <- plot_richness(
+  ps.16s, x = "Year",
+  measures = c("Shannon", "Simpson"),
+  color = "pod"
+)$data
+
+```
+
+
+```{r Shannon Diversity by Month}
+# Orders Months Correctly for Plotting
+pr16s_data$Month <- factor(pr16s_data$Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"))
+
+# Filters for Shannon Diversity
+sh_data <- pr16s_data %>%
+  filter(pr16s_data$variable == "Shannon")
+
+p1 <- ggplot(sh_data, aes(Month, value)) +
+  geom_point()
+
+p1
+```
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
