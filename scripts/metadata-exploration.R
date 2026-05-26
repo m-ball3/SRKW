@@ -78,6 +78,15 @@ meta <- meta %>%
 meta_clean <- meta %>% 
   filter(!is.na(Year), !is.na(Pod))
 
+# Consolidates F and Female and M and Male
+meta_clean <- meta_clean %>%
+  mutate(
+    Sex = dplyr::recode(Sex,
+                        "F" = "Female",
+                        "M" = "Male", 
+                        "Undetermined" = "UNK")
+  )
+
 # ------------------------------------------------------------------
 # Exploration - Bar Plots
 # ------------------------------------------------------------------
@@ -106,17 +115,16 @@ p0
 # plots sample count by year, faceted by pod and sex
 p1 <- ggplot(meta_clean, aes(x = Year, fill = Pod)) +
   geom_bar() +
-  facet_grid(Sex ~ Pod)+
-  geom_text(stat = "count",
-            aes(label = ..count..),
-            vjust = -0.3,
-            size = 5) +
+  # geom_text(stat = "count",
+  #           aes(label = ..count..),
+  #           vjust = -0.3,
+  #           size = 5) +
   labs(x = "", y = "Sample Count") +
   scale_y_continuous(expand = y_expand) +
   theme_test(base_size = base_size) +
   theme(
     axis.text.x = element_text(angle = 90),
-    legend.position = "none"
+    legend.position = "bottom"
   ) +
   scale_fill_brewer(palette = "Paired")
 p1
@@ -124,7 +132,6 @@ p1
 # plots sample count by sample, faceted by pod
 p2 <- ggplot(meta_clean, aes(x = ID, fill = Pod)) +
   geom_bar() +
-  facet_wrap(~ Pod, scales = "free_x", ncol = 1, strip.position = "right") +
   geom_text(stat = "count",
             aes(label = ..count..),
             vjust = -0.3,
@@ -156,6 +163,30 @@ p3 <- ggplot(meta_clean, aes(x = ID, fill = Pod)) +
   ) +
   scale_fill_brewer(palette = "Paired")
 p3
+
+# plots sample count by year, faceted by pod and sex
+p4 <- ggplot(meta_clean, aes(x = Year, fill = Sex)) +
+  geom_bar() +
+  # geom_text(stat = "count",
+  #           aes(label = ..count..),
+  #           vjust = -0.3,
+  #           size = 5) +
+  labs(x = "", y = "Sample Count") +
+  scale_y_continuous(expand = y_expand) +
+  theme_test(base_size = base_size) +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    legend.position = "bottom"
+  ) +
+  scale_fill_brewer(palette = "Paired")
+p4
+
+#saves plots 
+ggsave("Deliverables/metadata/by-year.png", plot = p0, width = 20, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/metadata/podby-year.png", plot = p1, width = 20, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/metadata/ID.png", plot = p2, width = 20, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/metadata/sexby-year.png", plot = p4, width = 20, height = 8, units = "in", dpi = 300)
+
 
 ##-----------------------------------------------------------------------------------------------------------------------
 # Count samples by Year, ID, and Pod
