@@ -237,7 +237,7 @@ ggsave("Deliverables/ALL/srkw-family.png", plot = fam.rel.plot, width = 30, heig
 
 # plots fauceted plot by pod
 by.pod <- plot_bar(ps16s.rel, fill = "Species") +
-  facet_wrap(~ pod, ncol = 4, scales = "free_x", strip.position = "top") +
+  facet_wrap(~ Pod, ncol = 4, scales = "free_x", strip.position = "top") +
   theme_minimal() +
   theme(
     axis.text.x = element_blank(),  # Removes x-axis sample names
