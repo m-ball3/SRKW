@@ -1,9 +1,4 @@
 # ------------------------------------------------------------------
-# CURRENTLY WRITTEN TO JUST INCLUDE SDZWA SAMPLES
-# ------------------------------------------------------------------
-
-
-# ------------------------------------------------------------------
 # FROM DADA2 TO PHYLOSEQ
 # THIS IS THE SECOND STEP AFTER DADA2
 ## rownames-match.r must be run before this!
@@ -66,7 +61,7 @@ saveRDS(ps.16s, "srkw-ps.16s.ALL")
 
 
 # Plots stacked bar plot of abundance - to confirm presence of NA's
-plot_bar(ps.16s, fill="Species")
+# plot_bar(ps.16s, fill="Species")
 
 ## MERGE TO SPECIES HERE (TAX GLOM)
 ps.16s = tax_glom(ps.16s, "Species", NArm = FALSE)

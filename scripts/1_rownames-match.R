@@ -124,7 +124,7 @@ rownames(samdf) <- new_meta_names
 sofdf <- read.csv("./metadata/Sofia's samples/SRKW_WO_SDZWA_06182024.csv")
 
 sofdf <- sofdf %>%
-  select(LabID, FieldID, IndID_SDZWA)
+  dplyr::select(LabID, FieldID, IndID_SDZWA)
 
 sofdf <- sofdf %>%
   rename(Sample_name = LabID)%>%
@@ -205,7 +205,7 @@ SRA_list <- read.csv("./PRJNA1068648/srkw_sra_list.csv")
 
 SRA_list <- SRA_list %>%
   rename(Sample_name = SampleName) %>%
-  select(Sample_name, Run)
+  dplyr::select(Sample_name, Run)
 
 # Left joins by Sample_name
 akdf <- akdf %>%

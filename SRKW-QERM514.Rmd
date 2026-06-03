@@ -27,6 +27,11 @@ library(tidyverse)
 library(dplyr)
 library(tibble)
 library(patchwork)
+library(MASS)
+library(lme4)
+library(glmmTMB)
+library(MuMIn)
+library(DHARMa)
 ```
 
 ## Fine Scale Diet Variability in Southern resident killer whales (Orcinus orca ater)
@@ -36,9 +41,9 @@ library(patchwork)
 Research Question: 
 Hypotheses and Expectations: hypothesis/hypotheses you’re addressing; predictions from hypotheses
 Hypothesis 1: There will be variability in SRKW diet across pods (J, K, and L)
-Hypothesis 2: There will be variability in SRKW diet across seasons 
+Hypothesis 2: There will be variability in SRKW diet across year
 Hypothesis 3: There will be variability in SRKW diet across sex
-Hypothesis 4: There will be variability in SRKW diet across time
+Hypothesis 4: There will be variability in SRKW diet across season
 
 Preliminary analysis (175 samples out of ~500 total samples[MB4.1]) shows that the diet composition of SRKW is relatively consistent with known diet composition, with over 80% of sequence reads assigning to Onchorhynchus tshawytascha (Figure 4). 
 
@@ -67,10 +72,12 @@ samdf_filt <- samdf_filt %>%
 
 # Selects the column for relative abundance of Chinook per sample
 # renames column X to match samdf_filt
+head(df)
+
 df_chin <- df %>%
-  select(X, Oncorhynchus.tshawytscha)%>%
-  rename(Sample_name = X) %>%
-  rename(chin = Oncorhynchus.tshawytscha)
+  dplyr::select(X, Oncorhynchus.tshawytscha)%>%
+  dplyr::rename(Sample_name = X) %>%
+  dplyr::rename(chin = Oncorhynchus.tshawytscha)
 
 # Adds metadata from samdf_filt to df_chin by Sample_name
 ?left_join()
@@ -87,6 +94,11 @@ df_chin <- df_chin %>%
 
 ```
 
+
+$$ DESCRIBE THE DATA HERE $$
+' chin = the relative abundance of Chinook in the diet of each sample (functionally, the proportion of Chinook salmon)
+
+
 I WANT TO LOOK AT THE PERCENT OF CHINOOK IN THE DIET ACROSS DIFFERENT PREDICTOR VARIABLES
 SEASON
 AGE CLASS
@@ -101,30 +113,38 @@ You can also embed plots, for example:
 ```{r Exploratory plots}
 
 # Plots the relative abundance of Chinook per sample
-p1 <- ggplot(df_chin, aes(ID, chin)) + 
-  geom_point()
+p1 <- ggplot(df_chin, aes(ID, chin, color = ID)) + 
+  geom_point()+
+  ylab("Relative Abundance of Chinook")+
+  theme_minimal()+
+  theme(legend.position = "none")
   
 p1
 
 # Plots the relative abundance of Chinook per year
-p2 <- ggplot(df_chin, aes(Year, chin, fill = ID)) + 
+p2 <- ggplot(df_chin, aes(Year, chin, color = ID)) + 
   geom_point() + 
+  ylab("Relative Abundance of Chinook")+
   theme_minimal()+
   theme(legend.position = "none")
   
 p2
 
 # Plots the relative abundance of Chinook per season
-p3 <- ggplot(df_chin, aes(season, chin)) + 
+p3 <- ggplot(df_chin, aes(season, chin, color = ID)) + 
   geom_point()+ 
-  theme_minimal() 
+  # ylab("Relative Abundance of Chinook (%)")+
+  theme_minimal() +
+  theme(legend.position = "none")
   
 p3
 
 # Plots the relative abundance of Chinook per pod
-p4 <- ggplot(df_chin, aes(pod, chin)) + 
+p4 <- ggplot(df_chin, aes(Pod, chin, color = ID)) + 
   geom_point()+ 
-  theme_minimal()
+  # ylab("Relative Abundance of Chinook (%)")+
+  theme_minimal()+
+  theme(legend.position = "none")
   
 p4
 
@@ -141,23 +161,310 @@ p4
 
 ```
 
-Reminder: the models I am interested in
-Hypothesis 1: There will be variability in SRKW diet across pods (J, K, and L)
-Hypothesis 2: There will be variability in SRKW diet across seasons 
-Hypothesis 3: There will be variability in SRKW diet across sex
-Hypothesis 4: There will be variability in SRKW diet across time
+According to these plots, I see some possible differences across parameters. 
+For individual, I see that there are many whales for which we have more than one sample. I also see a wide spread of percent of chinook found in the diet (0%-100% chinook). Because there is individual variation here, I want to make sure to capture that in the model. Because each sample from the same individual will not be independent (samples from one individual can be thought of as a "grouping"), I plan to include this as a random effect. 
 
-```{r m1 - percent chinook in diet vs pod}
+I don't see a clear pattern for relative abundance of chinook in the diet by year. 
+
+I also don't see any pattern for relative abundance of chinook by season, expect that it looks like sampling effort was lower in the Spring compared to the Summer, Fall, and Winter. I also see that individuals from different pods may be more prevalent in our sampling areas in certain seasons. For example, individuals from J pod seem to make up most of the available samples from the summer months, and samples from L pod may be more available in the Autumn. Interestingly, there may also be a higher percent of Chinook in the diet for L pod in Autumn vs J pod, but it is hard to make any real statements at this time. 
+
+
+## Now, to explore what kind of model to run, I will further explore the data and run some assumptions tests. 
+
+
+```{r tests for normality}
+
+# Visual and statistical tests for normality
+
+# Histogram of the relative abundance of chinook
+?hist()
+hist(df_chin$chin) #this data definitely does not appear normal
+
+
+# Shapiro Wilkes test for normality
+
+# makes chin in df_chin an numeric vector
+x <- df_chin$chin
+range(x)
+
+# Runs Shapiro-Wilk normality test
+## Null hypothesis: the data are normal
+## Alt hypotheeiss: the data are not normal
+## alpha = 0.5
+
+shapiro.test(x) #p = 2.2e-16
 
 ```
-```{r m4 - percent chinook in diet vs season}
+Upon visual inspection, the data does not look normally distributed. Using a Shapiro-Wilk test, this is corroborated. With a p value << 0.05, we reject the null and conclude that the data are not normally distributed. 
+
+This rules out using 
+
+Simple model: does the relative abundance of Chinook in the diet of SRKW vary by pod?
+
+Because of the distribution of this data, and because it is proportional data, I have chosen to use a GLMM with a beta regression and the logit link function. Here are the three fundamental components: 
+
+distribution of the data:
+$$
+X_i \sim Beta(\alpha_i, \beta_i)
+$$
+link function:
+$$
+logit(\alpha_i)=log(\alpha_i/1−\alpha_i)= \eta_i
+$$
+
+linear predictor: 
+$$
+\eta_i = \alpha
+$$
+
+
+```{r tests for the simple model for chin~pod (no random effect)}
+??glmm()
+
+
+## even though my range was confirmed as 0 - 1, glmmTMB hates it, stackoverflow said to try this 'nudge' method.
+eps <- 0.001
+df_chin$chin_beta <- pmin(pmax(df_chin$chin, eps), 1 - eps)
+
+pod_mod <- glmmTMB(chin_beta ~ Pod,
+                   data = df_chin,
+                   family = beta_family(link = "logit"))
+summary(pod_mod)
+
+## USE DHARMa FOR DIAGNOSTIC PLOTS
 
 ```
-```{r m1 - percent chinook in diet vs sex}
+``` {r pod res}
+# Simulate residuals
+res_pod <- simulateResiduals(
+  fittedModel = pod_mod,
+  n = 1000,          # more sims = smoother diagnostics
+  plot = FALSE       # we'll call plot() explicitly
+)
+
+# Basic DHARMa diagnostic plots
+plot(res_pod)        # QQ + residual vs predicted + histogram, etc.
+
+# Uniformity test (are residuals ~ Uniform(0,1)?)
+testUniformity(res_pod)
+
+# Over/underdispersion test
+testDispersion(res_pod)
+
+# Outlier test
+testOutliers(res_pod)
+
+# residuals vs fitted values
+
+plotResiduals(res_pod, predict(pod_mod, type = "response"))
+```
+
+Nothing but the intercept is significant here, showing that there is no difference in the relative abundance of salmon across pod (not including a random effect)
+
+with the random effect: 
+
+distribution of the data:
+$$
+X_i \sim Beta(\alpha_i, \beta_i)
+$$
+link function:
+$$
+logit(\alpha_i)=log(\alpha_i/1−\alpha_i)= \eta_i
+$$
+
+linear predictor: 
+$$
+\eta_i = \alpha
+$$
+
+
+```{r tests for the simple model for chin~pod with random effect}
+pod_wRE_mod <- glmmTMB(chin_beta ~ Pod + (1 | ID),
+                   data = df_chin,
+                   family = beta_family(link = "logit"))
+summary(pod_wRE_mod)
 
 ```
-```{r m1 - percent chinook in diet vs year}
+Still, nothing aside from the intercept is significant. 
+
+
+``` {r pod wRE res}
+# Simulate residuals
+res_pod_wRE <- simulateResiduals(
+  fittedModel = pod_wRE_mod,
+  n = 1000,          # more sims = smoother diagnostics
+  plot = FALSE       # we'll call plot() explicitly
+)
+
+# Basic DHARMa diagnostic plots
+plot(res_pod_wRE)
+
+# Uniformity test (are residuals ~ Uniform(0,1)?)
+testUniformity(res_pod_wRE)
+
+# Over/underdispersion test
+testDispersion(res_pod_wRE)
+
+# Outlier test
+testOutliers(res_pod_wRE)
+
+# residuals vs fitted values
+
+plotResiduals(res_pod_wRE, predict(pod_wRE_mod, type = "response"))
+```
+
+
+Let's try year:
+
+distribution of the data:
+$$
+X_i \sim Beta(\alpha_i, \beta_i)
+$$
+link function:
+$$
+logit(\alpha_i)=log(\alpha_i/1−\alpha_i)= \eta_i
+$$
+
+linear predictor: 
+$$
+\eta_i = \alpha
+$$
+
+
+```{r tests for the simple model for chin~year (no random effect)}
+
+
+year_mod <- glmmTMB(chin_beta ~ Year,
+                   data = df_chin,
+                   family = beta_family(link = "logit"))
+summary(year_mod)
+
+```
+Year is not significant. 
+
+with the random effect: 
+
+distribution of the data:
+$$
+X_i \sim Beta(\alpha_i, \beta_i)
+$$
+link function:
+$$
+logit(\alpha_i)=log(\alpha_i/1−\alpha_i)= \eta_i
+$$
+
+linear predictor: 
+$$
+\eta_i = \alpha
+$$
+
+```{r tests for the simple model for chin~year with random effect}
+year_wRE_mod <- glmmTMB(chin_beta ~ Year + (1 | ID),
+                   data = df_chin,
+                   family = beta_family(link = "logit"))
+summary(year_wRE_mod)
+
 
 ```
 
+Still nothing. 
+
+Trying season: 
+
+```{r tests for the simple model for chin~season (no random effect)}
+
+
+month_mod <- glmmTMB(chin_beta ~ Month,
+                   data = df_chin,
+                   family = beta_family(link = "logit"))
+summary(month_mod)
+
+```
+
+We are cooking with something now! Some of the months are significant. 
+
+adding a random effect:
+```{r tests for the simple model for chin~season with random effect}
+
+
+month_wRE_mod <- glmmTMB(chin_beta ~ Month + (1 | ID),
+                   data = df_chin,
+                   family = beta_family(link = "logit"))
+summary(month_wRE_mod)
+
+```
+I now want to see if we can better this 
+
+```{r tests for the simple model for chin~season with random effect}
+
+podmonth_mod <- glmmTMB(chin_beta ~ Pod + Month,
+                   data = df_chin,
+                   family = beta_family(link = "logit"))
+summary(podmonth_mod)
+
+```
+
+```{r tests for the simple model for chin~season with random effect}
+
+podmonth_wRE_mod <- glmmTMB(chin_beta ~ Pod + Month + (1 | ID),
+                   data = df_chin,
+                   family = beta_family(link = "logit"))
+summary(podmonth_wRE_mod)
+
+```
+SAY SOMETHING ABOUT THAT PROBABLY
+
+
+
+``` {r for getting a delta AIC table}
+## Collect models in a named list
+mod_list <- list(
+  pod      = pod_mod,
+  pod_RE   = pod_wRE_mod,
+  year     = year_mod,
+  year_RE  = year_wRE_mod,
+  month    = month_mod,
+  month_RE = month_wRE_mod, 
+  podmonth = podmonth_mod,
+  podmonth_RE = podmonth_wRE_mod
+  
+)
+
+## Compute AICc for each
+mod_res <- data.frame(
+  model = names(mod_list),
+  AICc  = sapply(mod_list, MuMIn::AICc)
+)
+
+## Order by AICc
+mod_res <- mod_res[order(mod_res$AICc), ]
+
+## ΔAICc
+mod_res$delta_AICc <- mod_res$AICc - min(mod_res$AICc)
+
+## Akaike weights based on AICc
+mod_res$weight <- exp(-0.5 * mod_res$delta_AICc)
+mod_res$weight <- mod_res$weight / sum(mod_res$weight)
+
+## Round for easier viewing
+mod_res$AICc        <- round(mod_res$AICc, 2)
+mod_res$delta_AICc  <- round(mod_res$delta_AICc, 2)
+mod_res$weight      <- round(mod_res$weight, 2)
+
+mod_res
+```
+
+The best model here is actually the model that just includes month, though I think that all of these models are bad. I will know what not to do!
+
+Let's run some diagnostics, though, for funzies.
+
+
+
+Residual simulation and plots (e.g., DHARMa for GLMMs).
+
+
+
+
+
+Checks of random‑effects variance estimates, overdispersion, and leverage/influence.
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
