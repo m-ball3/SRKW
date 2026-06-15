@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------
 # FROM DADA2 TO PHYLOSEQ
 # THIS IS THE SECOND STEP AFTER DADA2
-## rownames-match.r must be run before this!
+## rownames-match.r and replicates-contaminated.r must be run before this!
 # ------------------------------------------------------------------
 
 
@@ -23,7 +23,7 @@ library(tibble)
 # Loads in Data
 # ------------------------------------------------------------------
 # Loads in output from DADA2 + filtered seqtab.nochim and samdf from rownames-match.r
-load("rownames-match.RData")
+load("replicates-contaminated.RData")
 
 # Creates master phyloseq object
 ps.16s <- phyloseq(otu_table(seqtab.nochim_filt, taxa_are_rows=FALSE), 
@@ -65,6 +65,8 @@ saveRDS(ps.16s, "srkw-ps.16s.ALL")
 
 ## MERGE TO SPECIES HERE (TAX GLOM)
 ps.16s = tax_glom(ps.16s, "Species", NArm = FALSE)
+ps.16s.filt = tax_glom(ps.16s.filt, "Species", NArm = FALSE)
+ps.16s.major = tax_glom(ps.16s.major , "Species", NArm = FALSE)
 
 # Plots stacked bar plot of abundance - to confirm presence of NA's
 abs <- plot_bar(ps.16s, fill="Species")
@@ -96,6 +98,8 @@ ps.16s.major.rel <- transform_sample_counts(ps.16s.major, function(x) {
 
 #Checks for NaN's 
 which(is.nan(as.matrix(otu_table(ps16s.rel))), arr.ind = TRUE)
+which(is.nan(as.matrix(otu_table(ps.16s.filt.rel))), arr.ind = TRUE)
+which(is.nan(as.matrix(otu_table(ps.16s.major.rel))), arr.ind = TRUE)
 
 #SAVES
 save(seqtab.nochim_filt, freq.nochim, track, taxam, ps16s.rel, ps.16s, file = "SRKW-diet-16SALL.Rdata")
@@ -256,8 +260,8 @@ ggsave("Deliverables/ALL/srkw-by.pod.png", plot = by.pod, width = 30, height = 8
 # ------------------------------------------------------------------
 
 # CREATES ABSOLUTE SAMPLES X SPECIES TABLE 
-otu.abs <- as.data.frame(otu_table(ps.16s))
-colnames(otu.abs) <- as.data.frame(tax_table(ps.16s))$Species
+otu.abs <- as.data.frame(otu_table(ps.16s.major))
+colnames(otu.abs) <- as.data.frame(tax_table(ps.16s.major))$Species
 
 ## Adds ADFG Sample ID as a column
 otu.abs$Specimen.ID <- samdf_filt$Specimen.ID
@@ -266,8 +270,8 @@ otu.abs$Specimen.ID <- samdf_filt$Specimen.ID
 otu.abs <- otu.abs[, c(ncol(otu.abs), 1:(ncol(otu.abs)-1))]
 
 # CREATES RELATIVE SAMPLES X SPECIES TABLE
-otu.prop <- as.data.frame(otu_table(ps16s.rel))
-colnames(otu.prop) <- as.data.frame(tax_table(ps16s.rel))$Species
+otu.prop <- as.data.frame(otu_table(ps.16s.major.rel))
+colnames(otu.prop) <- as.data.frame(tax_table(ps.16s.major.rel))$Species
 
 ## Adds ADFG Sample ID as a column (do NOT set as row names if not unique)
 otu.prop$Specimen.ID <- samdf_filt$Specimen.ID
@@ -283,8 +287,8 @@ is.num <- sapply(otu.prop, is.numeric)
 otu.prop[is.num] <- lapply(otu.prop[is.num], round, 3)
 
 # Writes to CSV
-write.csv(otu.abs, "./Deliverables/ALL/SRKW_absolute_speciesxsamples.csv", row.names = TRUE)
-write.csv(otu.prop, "./Deliverables/ALL/SRKW_relative_speciesxsamples.csv", row.names = TRUE)
+write.csv(otu.abs, "./Deliverables/ALL/SRKW_absolute_speciesxsamples-MAJOR.csv", row.names = TRUE)
+write.csv(otu.prop, "./Deliverables/ALL/SRKW_relative_speciesxsamples-MAJOR.csv", row.names = TRUE)
 
 
 # Calculates the total percent abundance for each prey species (across all samples)

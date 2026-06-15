@@ -7,6 +7,8 @@
 library(tidyverse)
 library(dplyr)
 library(tibble)
+library(stringr)
+library(lubridate)
 
 
 # ------------------------------------------------------------------
@@ -239,6 +241,103 @@ samdf_all <- dplyr::bind_rows(samdf, sofdf, akdf)
 
 #---------------------------------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------
+# Adds in columns for easier data analysis
+# ------------------------------------------------------------------
+
+
+
+# --------------------------------------------------------------------------------------------------------
+##DATES
+
+
+# for columns that don't have Month, Date, or Year, pulls from sample_name and then from FieldID
+df_parsed <- samdf_all %>%
+  mutate(
+    # Extract parts using regex: F + YY + MMM + DD
+    yy  = str_match(Sample_name, "^F(\\d{2})([A-Za-z]{3})(\\d{2})")[, 2],
+    mon = str_match(Sample_name, "^F(\\d{2})([A-Za-z]{3})(\\d{2})")[, 3],
+    dd  = str_match(Sample_name, "^F(\\d{2})([A-Za-z]{3})(\\d{2})")[, 4],
+    
+    # Convert 2-digit year to 4-digit year (assume 20xx)
+    year_from_name  = ifelse(!is.na(yy), 2000 + as.integer(yy), NA_integer_),
+    month_from_name = ifelse(!is.na(mon), toupper(mon), NA_character_),
+    day_from_name   = ifelse(!is.na(dd),  as.integer(dd),   NA_integer_)
+  )
+
+samdf_all <- df_parsed %>%
+  mutate(
+    # If Year / Month / Day are NA, fill from parsed values
+    Year  = if_else(is.na(Year),  year_from_name, Year),
+    Month = if_else(is.na(Month), month_from_name, Month),
+    Day   = if_else(is.na(Day),   day_from_name,  Day)
+  )
+
+
+# for columns that don't have Month, Date, or Year, pulls from sample_name
+df_parsed <- samdf_all %>%
+  mutate(
+    # Extract parts using regex: F + YY + MMM + DD
+    yy  = str_match(FieldID, "^T?F(\\d{2})([A-Za-z]{3})(\\d{2})")[, 2],
+    mon = str_match(FieldID, "^T?F(\\d{2})([A-Za-z]{3})(\\d{2})")[, 3],
+    dd  = str_match(FieldID, "^T?F(\\d{2})([A-Za-z]{3})(\\d{2})")[, 4],
+    
+    # Convert 2-digit year to 4-digit year (assume 20xx)
+    year_from_name  = ifelse(!is.na(yy), 2000 + as.integer(yy), NA_integer_),
+    month_from_name = ifelse(!is.na(mon), toupper(mon), NA_character_),
+    day_from_name   = ifelse(!is.na(dd),  as.integer(dd),   NA_integer_)
+  )
+
+samdf_all <- df_parsed %>%
+  mutate(
+    # If Year / Month / Day are NA, fill from parsed values
+    Year  = if_else(is.na(Year),  year_from_name, Year),
+    Month = if_else(is.na(Month), month_from_name, Month),
+    Day   = if_else(is.na(Day),   day_from_name,  Day)
+  )
+
+
+# Normalizes the format, makes them a factor, and then creates a Julian day continuous variable for date (for season, etc. analysis downstream)
+samdf_all <- samdf_all %>%
+  mutate(
+    Month = str_to_title(Month),
+    Month = factor(
+      Month,
+      levels = month.abb,
+      ordered = TRUE
+    ),
+    date = dmy(paste(Day, as.character(Month), Year)),
+    julian_day = yday(date)
+  )
+
+# adds column for season
+samdf_all <- samdf_all %>%
+  mutate(season = case_when(
+    Month %in% c("Dec", "Jan", "Feb") ~ "Winter",
+    Month %in% c("Mar", "Apr", "May") ~ "Spring",
+    Month %in% c("Jun", "Jul", "Aug") ~ "Summer",
+    Month %in% c("Sep", "Oct", "Nov") ~ "Autumn"
+  ))
+
+
+#---------------------------------------------------------------------------------------------------------------------------
+## POD
+
+# Pulls the pod from the ID if it isn't already noted in the pod column
+samdf_all <- samdf_all %>%
+  mutate(
+    pod_from_id = str_match(ID, "^([JKL])")[, 2],
+    pod_from_id = if_else(pod_from_id == "", NA_character_, pod_from_id),
+    Pod = if_else(is.na(Pod), pod_from_id, Pod)    # only fill where it's NA
+  )
+
+#makes all NAs UNK
+samdf_all <- samdf_all %>%
+  mutate(
+    Pod = if_else(is.na(Pod), "UNK", Pod)
+  )
+
+
 ### CREATES NEW SAMDF AND SEQTAB THAT OVERLAPS-------------------------------------------------------------------------------
 # intersection of sample names
 common_samps <- intersect(rownames(samdf_all), rownames(seqtab.nochim))
@@ -266,8 +365,7 @@ rownames(seqtab.nochim_filt)
 
 
 
-table(samdf$pod)
-# J = 188, K = 51,  = 108
+
 
 ### Save data
 save(samdf_filt, seqtab.nochim_filt, taxam, track, out, freq.nochim, file = "rownames-match.RData")

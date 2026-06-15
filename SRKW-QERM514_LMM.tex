@@ -1,0 +1,1089 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={SRKW-QERM514\_LMM},
+  pdfauthor={Mollie Ball},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{SRKW-QERM514\_LMM}
+\author{Mollie Ball}
+\date{2026-06-05}
+
+\begin{document}
+\maketitle
+
+\subsection{Fine Scale Diet Variability in Southern resident killer
+whales (Orcinus orca
+ater)}\label{fine-scale-diet-variability-in-southern-resident-killer-whales-orcinus-orca-ater}
+
+\begin{verbatim}
+Southern resident killer whales (Orcinus orca ater; SRKW), with just 74 members of the population, have been listed as Endangered Species under the U.S. Endangered Species Act (ESA) since 2005 (Krahn et al., 2004). They occupy the inland and offshore waters of the Pacific Northwest, with ranges spanning from California to Southern Alaska; critical habitat for SRKWs includes Puget Sound, found in Washington state (Krahn et al., 2004).
+The main threats to SRKW are a lack of prey, vessel disturbance, contaminants (especially persistent organic pollutants (POPs)), and inbreeding (Switzer et al., 2026; Van Cise et al., 2024). Further, nutritional stress can work synergistically to amplify the effects of each stressor (Switzer et al., 2026). SRKW diets are culturally learned and believed to comprise almost entirely (>80%) of Chinook salmon (Oncorhynchus tshawytscha) (Van Cise et al., 2024). Many Chinook salmon populations in the Puget Sound region are also listed as threatened, endangered, or critical under the Endangered Species Act (Ford et al., 2011). 
+For this project, I therefore aim to use data generated by genetic metabarcoding of the 16S region of mitochondrial DNA SRKW fecal samples collected from 2007 to 2025 (n=nearly 500[MB1.1]) in Washington state and surrounding waters to describe any spatial, temporal, and/or demographic (e.g. by sex, pod, age class, etc.) changes therein. [MB2.1]Library preparation was conducted by the San Diego Zoo and Wildlife Alliance (Escondido, CA). [MB3.1]
+\end{verbatim}
+
+Research Question: Hypotheses and Expectations: hypothesis/hypotheses
+you're addressing; predictions from hypotheses Alternative Hypothesis 1:
+There will be variability in SRKW diet across pods (J, K, and L)
+Alternative Hypothesis 2: There will be variability in SRKW diet across
+year Alternative Hypothesis 3: There will be variability in SRKW diet
+across julian day (season)
+
+\subsection{Background about these
+data}\label{background-about-these-data}
+
+Data generated by genetic metabarcoding of the 16S region of
+mitochondrial DNA SRKW fecal samples collected from 2007 to 2025 in
+Washington state and surrounding waters.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Loads in output from DADA2 + filtered seqtab.nochim and samdf from rownames{-}match.r}
+\FunctionTok{load}\NormalTok{(}\StringTok{"replicates{-}contaminated.Rdata"}\NormalTok{)}
+
+\CommentTok{\# Loads in species relative abundance x sample table}
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"./Deliverables/ALL/SRKW\_relative\_speciesxsamples.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Because of the nature of metabarcoding, absolute abundance cannot be
+determined from the methods. We therefore transform the raw counts into
+relative abundance data, which is reflected in df.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#?select()}
+
+\CommentTok{\# Messes with row and column names in samdf\_filt for ease}
+\NormalTok{samdf\_filt }\OtherTok{\textless{}{-}}\NormalTok{ samdf\_filt }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}\AttributeTok{Sample\_name2 =}\NormalTok{ Sample\_name)}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rownames\_to\_column}\NormalTok{(}\StringTok{"Sample\_name"}\NormalTok{)}
+
+\CommentTok{\# Selects the column for relative abundance of Chinook per sample}
+\CommentTok{\# renames column X to match samdf\_filt}
+\FunctionTok{head}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                     X Cottus.asper Oncorhynchus.tshawytscha Oncorhynchus.keta
+## 1     F21SEP11-01B-S1            0                    0.068              0.36
+## 2     F22MAY30-05A-S2            0                    0.989              0.00
+## 3     F22MAY30-05B-S3            0                    0.992              0.00
+## 4     F22SEP06-01C-S4            0                    1.000              0.00
+## 5 10Nov2022-3-Post-S5            0                    0.953              0.00
+## 6     F23JUL01-03A-S6            0                    1.000              0.00
+##   Oncorhynchus.kisutch Ophiodon.elongatus Oncorhynchus.nerka Raja.binoculata
+## 1                0.559              0.000                  0               0
+## 2                0.000              0.000                  0               0
+## 3                0.000              0.000                  0               0
+## 4                0.000              0.000                  0               0
+## 5                0.000              0.042                  0               0
+## 6                0.000              0.000                  0               0
+##   Oncorhynchus.mykiss Hydrolagus.colliei Anoplopoma.fimbria
+## 1               0.000                  0                  0
+## 2               0.008                  0                  0
+## 3               0.003                  0                  0
+## 4               0.000                  0                  0
+## 5               0.005                  0                  0
+## 6               0.000                  0                  0
+##   Hippoglossus.stenolepis Atheresthes.stomias Raja.rhina   NA.
+## 1                       0                   0          0 0.013
+## 2                       0                   0          0 0.003
+## 3                       0                   0          0 0.005
+## 4                       0                   0          0 0.000
+## 5                       0                   0          0 0.001
+## 6                       0                   0          0 0.000
+##   Citharichthys.stigmaeus NA.1 Oncorhynchus.gorbuscha Salmo.salar
+## 1                       0    0                      0           0
+## 2                       0    0                      0           0
+## 3                       0    0                      0           0
+## 4                       0    0                      0           0
+## 5                       0    0                      0           0
+## 6                       0    0                      0           0
+##   Clupea.pallasii Gadus.chalcogrammus Citharichthys.sordidus Liparis.pulchellus
+## 1               0                   0                      0                  0
+## 2               0                   0                      0                  0
+## 3               0                   0                      0                  0
+## 4               0                   0                      0                  0
+## 5               0                   0                      0                  0
+## 6               0                   0                      0                  0
+##   Zaprora.silenus Carcharodon.carcharias Myoxocephalus.polyacanthocephalus
+## 1               0                      0                                 0
+## 2               0                      0                                 0
+## 3               0                      0                                 0
+## 4               0                      0                                 0
+## 5               0                      0                                 0
+## 6               0                      0                                 0
+##   Cymatogaster.aggregata Glyptocephalus.zachirus NA.2 Ammodytes.hexapterus NA.3
+## 1                      0                       0    0                    0    0
+## 2                      0                       0    0                    0    0
+## 3                      0                       0    0                    0    0
+## 4                      0                       0    0                    0    0
+## 5                      0                       0    0                    0    0
+## 6                      0                       0    0                    0    0
+##   NA.4 Liparis.florae NA.5 Microstomus.pacificus Anarrhichthys.ocellatus NA.6
+## 1    0              0    0                     0                       0    0
+## 2    0              0    0                     0                       0    0
+## 3    0              0    0                     0                       0    0
+## 4    0              0    0                     0                       0    0
+## 5    0              0    0                     0                       0    0
+## 6    0              0    0                     0                       0    0
+##   NA.7 Diaphus.theta Gasterosteus.aculeatus Engraulis.mordax
+## 1    0             0                      0                0
+## 2    0             0                      0                0
+## 3    0             0                      0                0
+## 4    0             0                      0                0
+## 5    0             0                      0                0
+## 6    0             0                      0                0
+##   Liparis.sp..BOLD.AAB4898 Squalus.acanthias NA.8 Merluccius.productus
+## 1                        0                 0    0                    0
+## 2                        0                 0    0                    0
+## 3                        0                 0    0                    0
+## 4                        0                 0    0                    0
+## 5                        0                 0    0                    0
+## 6                        0                 0    0                    0
+##   Thaleichthys.pacificus
+## 1                      0
+## 2                      0
+## 3                      0
+## 4                      0
+## 5                      0
+## 6                      0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_chin }\OtherTok{\textless{}{-}}\NormalTok{ df }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(X, Oncorhynchus.tshawytscha)}\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{rename}\NormalTok{(}\AttributeTok{Sample\_name =}\NormalTok{ X) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{rename}\NormalTok{(}\AttributeTok{y =}\NormalTok{ Oncorhynchus.tshawytscha)}
+
+\CommentTok{\# Adds metadata from samdf\_filt to df\_chin by Sample\_name}
+\CommentTok{\# ?left\_join()}
+\NormalTok{df\_chin }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(df\_chin, samdf\_filt, }\AttributeTok{by =} \StringTok{"Sample\_name"}\NormalTok{)}
+
+\CommentTok{\# Cleans Pod column}
+\NormalTok{df\_chin}\SpecialCharTok{$}\NormalTok{Pod[df\_chin}\SpecialCharTok{$}\NormalTok{Pod }\SpecialCharTok{==} \StringTok{"unknown"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"UNK"}
+\NormalTok{df\_chin}\SpecialCharTok{$}\NormalTok{Pod[}\FunctionTok{is.na}\NormalTok{(df\_chin}\SpecialCharTok{$}\NormalTok{Pod)] }\OtherTok{\textless{}{-}} \StringTok{"UNK"}
+\NormalTok{df\_chin}\SpecialCharTok{$}\NormalTok{Pod[df\_chin}\SpecialCharTok{$}\NormalTok{Pod }\SpecialCharTok{==} \StringTok{"NA"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"UNK"}
+\NormalTok{df\_chin}\SpecialCharTok{$}\NormalTok{Pod[df\_chin}\SpecialCharTok{$}\NormalTok{Pod }\SpecialCharTok{==} \StringTok{"J,K,L"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"UNK"}
+\NormalTok{df\_chin}\SpecialCharTok{$}\NormalTok{Pod[df\_chin}\SpecialCharTok{$}\NormalTok{Pod }\SpecialCharTok{==} \StringTok{"J,L"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"UNK"}
+\end{Highlighting}
+\end{Shaded}
+
+In df\_chin, we have:
+
+y = the percent of chinook in each sample (relative) ID = individual
+whale Year = the year the sample was collected Pod = the pod that the
+individual whale belongs to julian\_day = converted from Day, Month,
+Year that the sample was collected; used as a continuous proxy for
+season
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plots the relative abundance of Chinook per sample}
+\NormalTok{p1 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(df\_chin, }\FunctionTok{aes}\NormalTok{(ID, y, }\AttributeTok{color =}\NormalTok{ ID)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Relative Abundance of Chinook"}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+  
+\NormalTok{p1}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Exploratory plots-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plots the relative abundance of Chinook per year}
+\NormalTok{p2 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(df\_chin, }\FunctionTok{aes}\NormalTok{(Year, y, }\AttributeTok{color =}\NormalTok{ ID)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{theme\_minimal}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+  
+\NormalTok{p2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 6 rows containing missing values or values outside the scale range
+## (`geom_point()`).
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Exploratory plots-2.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plots the relative abundance of Chinook per season}
+\NormalTok{p3 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(df\_chin, }\FunctionTok{aes}\NormalTok{(julian\_day, y, }\AttributeTok{color =}\NormalTok{ ID)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Relative Abundance of Chinook (\%)"}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+  
+\NormalTok{p3}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 22 rows containing missing values or values outside the scale range
+## (`geom_point()`).
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Exploratory plots-3.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plots the relative abundance of Chinook per pod}
+\NormalTok{p4 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(df\_chin, }\FunctionTok{aes}\NormalTok{(Pod, y, }\AttributeTok{color =}\NormalTok{ ID)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+} 
+  \CommentTok{\# ylab("Relative Abundance of Chinook (\%)")+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+  
+\NormalTok{p4}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Exploratory plots-4.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(p1 }\SpecialCharTok{+}\NormalTok{ p2) }\SpecialCharTok{/}\NormalTok{ (p3 }\SpecialCharTok{+}\NormalTok{ p4)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 6 rows containing missing values or values outside the scale range
+## (`geom_point()`).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 22 rows containing missing values or values outside the scale range
+## (`geom_point()`).
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Exploratory plots-5.pdf}}
+
+According to these plots, I see some possible differences across
+parameters. For individual, I see that there are many whales for which
+we have more than one sample. I also see a wide spread of percent of
+chinook found in the diet (0\%-100\% chinook). Because there is
+individual variation here, I want to make sure to capture that in the
+model. Because each sample from the same individual will not be
+independent (samples from one individual can be thought of as a
+``grouping''), I plan to include this as a random effect.
+
+I don't see a clear pattern for relative abundance of chinook in the
+diet by year.
+
+I do see some structure by Julian day, which can be used as a continuous
+proxy for season. Though it does appear like sampling effort was lower
+in the Spring compared to the Summer, Fall, and Winter, with sampling
+effort being the highest in September (Julian day \textasciitilde70). I
+also see that individuals from different pods may be more prevalent in
+our sampling areas in certain seasons. For example, individuals from J
+pod seem to make up most of the available samples from the summer
+months, and samples from L pod may be more available in the Autumn.
+Interestingly, there may also be a higher percent of Chinook in the diet
+for L pod in Autumn vs J pod, but it is hard to make any real statements
+at this time.
+
+Upon visual inspection, the data does not look normally distributed.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Visual and statistical tests for normality}
+
+\CommentTok{\# Histogram of the relative abundance of chinook}
+\CommentTok{\# ?hist()}
+\FunctionTok{hist}\NormalTok{(df\_chin}\SpecialCharTok{$}\NormalTok{y) }\CommentTok{\#this data definitely does not appear normal}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Tests for normality-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Shapiro Wilkes test for normality}
+
+\CommentTok{\# makes chin in df\_chin an numeric vector}
+\NormalTok{x }\OtherTok{\textless{}{-}}\NormalTok{ df\_chin}\SpecialCharTok{$}\NormalTok{y}
+\FunctionTok{range}\NormalTok{(x)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Runs Shapiro{-}Wilk normality test}
+\DocumentationTok{\#\# Null hypothesis: the data are normal}
+\DocumentationTok{\#\# Alt hypotheeiss: the data are not normal}
+\DocumentationTok{\#\# alpha = 0.5}
+
+\FunctionTok{shapiro.test}\NormalTok{(x) }\CommentTok{\#p = 2.2e{-}16}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  x
+## W = 0.77205, p-value < 2.2e-16
+\end{verbatim}
+
+Using a Shapiro-Wilk test, this is corroborated. With a p value
+\textless\textless{} 0.05, we reject the null and conclude that the data
+are not normally distributed.
+
+This suggests that I will need more than just a simple linear model.
+Because of the distribution of this data, and because it is proportional
+data, I will try logit transforming my y and then using a linear mixed
+model; the logit is a transformation that takes a probability \(p\) (a
+value between 0 and 1) and maps it to a continuous, unconstrained value
+spanning from \(-\infty\) to \(+\infty\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\# I have some true 1\textquotesingle{}s and some true 0\textquotesingle{}s, this nudges them by 0.001}
+\NormalTok{eps }\OtherTok{\textless{}{-}} \FloatTok{0.001}
+\NormalTok{df\_chin}\SpecialCharTok{$}\NormalTok{y\_nudge }\OtherTok{\textless{}{-}} \FunctionTok{pmin}\NormalTok{(}\FunctionTok{pmax}\NormalTok{(df\_chin}\SpecialCharTok{$}\NormalTok{y, eps), }\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ eps)}
+
+\CommentTok{\# transforms chin column}
+\CommentTok{\# chin = percent of chinook in diet per sample }
+\CommentTok{\# y\_logit = logit of the percent of chinook in diet per sample}
+
+\NormalTok{df\_chin }\OtherTok{\textless{}{-}}\NormalTok{ df\_chin }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{y\_logit =} \FunctionTok{log}\NormalTok{(y\_nudge}\SpecialCharTok{/}\NormalTok{(}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{y\_nudge)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plots the relative abundance of Chinook per sample}
+\NormalTok{p5 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(df\_chin, }\FunctionTok{aes}\NormalTok{(ID, y\_logit, }\AttributeTok{color =}\NormalTok{ ID)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Relative Abundance of Chinook"}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+  
+\NormalTok{p5}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Exploratory plots post-transformation-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plots the relative abundance of Chinook per year}
+\NormalTok{p6 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(df\_chin, }\FunctionTok{aes}\NormalTok{(Year, y\_logit, }\AttributeTok{color =}\NormalTok{ ID)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{theme\_minimal}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+  
+\NormalTok{p6}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 6 rows containing missing values or values outside the scale range
+## (`geom_point()`).
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Exploratory plots post-transformation-2.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plots the relative abundance of Chinook per season}
+\NormalTok{p7 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(df\_chin, }\FunctionTok{aes}\NormalTok{(julian\_day, y\_logit, }\AttributeTok{color =}\NormalTok{ ID)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Relative Abundance of Chinook (\%)"}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+  
+\NormalTok{p7}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 22 rows containing missing values or values outside the scale range
+## (`geom_point()`).
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Exploratory plots post-transformation-3.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plots the relative abundance of Chinook per pod}
+\NormalTok{p8 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(df\_chin, }\FunctionTok{aes}\NormalTok{(Pod, y\_logit, }\AttributeTok{color =}\NormalTok{ ID)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+} 
+  \CommentTok{\# ylab("Relative Abundance of Chinook (\%)")+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+  
+\NormalTok{p8}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Exploratory plots post-transformation-4.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(p5 }\SpecialCharTok{+}\NormalTok{ p6) }\SpecialCharTok{/}\NormalTok{ (p7 }\SpecialCharTok{+}\NormalTok{ p8)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 6 rows containing missing values or values outside the scale range
+## (`geom_point()`).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 22 rows containing missing values or values outside the scale range
+## (`geom_point()`).
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Exploratory plots post-transformation-5.pdf}}
+
+This still does not look that much different. To test for normality now:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Visual and statistical tests for normality}
+
+\CommentTok{\# Histogram of the relative abundance of chinook}
+\CommentTok{\# ?hist()}
+\FunctionTok{hist}\NormalTok{(df\_chin}\SpecialCharTok{$}\NormalTok{y\_logit) }\CommentTok{\#this data definitely does not appear normal}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/Tests for normality post-transformation-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Shapiro Wilkes test for normality}
+
+\CommentTok{\# makes chin in df\_chin an numeric vector}
+\NormalTok{x }\OtherTok{\textless{}{-}}\NormalTok{ df\_chin}\SpecialCharTok{$}\NormalTok{y\_logit}
+\FunctionTok{range}\NormalTok{(x)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -6.906755  6.906755
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Runs Shapiro{-}Wilk normality test}
+\DocumentationTok{\#\# Null hypothesis: the data are normal}
+\DocumentationTok{\#\# Alt hypotheeiss: the data are not normal}
+\DocumentationTok{\#\# alpha = 0.5}
+
+\FunctionTok{shapiro.test}\NormalTok{(x) }\CommentTok{\#p = 1.016e{-}15}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  x
+## W = 0.91336, p-value = 1.016e-15
+\end{verbatim}
+
+These data are still not normally distributed. However, the residuals
+could be normally distributed.
+
+Thus, I will proceed exploring the fit of linear mixed effect models.
+Specifically, I will look for (1) residuals that are normal and
+homoscedastic, (2) violations of other LMM assumptions (linearity via QQ
+plot), etc., and (3) examine the fixed effects. I need a mixed effect
+model because ID should be a random effect: I expect that samples
+collected from the same individual are more similar than samples
+collected from different individuals.
+
+I will fit four models and compare them: 1. all three fixed effects + my
+random effect 2. only pod as a fixed effect + my random effect 3. only
+year as a fixed effect + my random effect 4. only julian day as a fixed
+effect + my random effect.
+
+I expect to see that the best model is Julian day + the random effect.
+This is consistent with anecdotal information from field observations
+(etc.), where SRKWs seem to eat more chinook in the summer months and
+supplement their diet with lingcod and other species of salmon in other
+months.
+
+However, there is also anecdotal evidence out there that suggests that
+different pods may eat chinook salmon at different proportions, so I
+will be looking for evidence of that, given the random effect of
+individual.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  all three fixed effects + my random effect \[
+  y_i = \beta_0 - \beta_1 Year_i + \beta_2 julian_i + \beta_3 Pod_i + \delta_{ID_i}+ \epsilon_i \\
+  \epsilon_i \sim \text{N}(0, \sigma_\epsilon^2) \\
+  \delta_{i} \sim \text{N}(0, \sigma_\delta^2) \\
+  \]
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# runs the lm with all the fixes effects and random effect}
+\NormalTok{allwRE\_mod }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(y\_logit }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Year }\SpecialCharTok{+}\NormalTok{ julian\_day }\SpecialCharTok{+}\NormalTok{ Pod }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{|}\NormalTok{ ID), }\AttributeTok{data =}\NormalTok{ df\_chin)}
+\FunctionTok{summary}\NormalTok{(allwRE\_mod)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Linear mixed model fit by REML ['lmerMod']
+## Formula: y_logit ~ Year + julian_day + Pod + (1 | ID)
+##    Data: df_chin
+## 
+## REML criterion at convergence: 2374.3
+## 
+## Scaled residuals: 
+##      Min       1Q   Median       3Q      Max 
+## -2.74444 -0.65340 -0.00526  0.86849  2.05681 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  ID       (Intercept)  2.609   1.615   
+##  Residual             13.081   3.617   
+## Number of obs: 428, groups:  ID, 99
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 86.651643  85.684218   1.011
+## Year        -0.040600   0.042501  -0.955
+## julian_day  -0.011827   0.002626  -4.503
+## PodK        -0.368129   0.762908  -0.483
+## PodL         0.495567   0.623967   0.794
+## PodUNK      -0.971673   0.900001  -1.080
+## 
+## Correlation of Fixed Effects:
+##            (Intr) Year   jln_dy PodK   PodL  
+## Year       -1.000                            
+## julian_day  0.024 -0.031                     
+## PodK       -0.108  0.106 -0.040              
+## PodL       -0.109  0.106 -0.087  0.367       
+## PodUNK      0.087 -0.089  0.031  0.241  0.282
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Residuals vs fitted}
+\FunctionTok{plot}\NormalTok{(}\FunctionTok{fitted}\NormalTok{(allwRE\_mod), }\FunctionTok{resid}\NormalTok{(allwRE\_mod),}
+     \AttributeTok{xlab =} \StringTok{"Fitted values"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Residuals"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{h =} \DecValTok{0}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/lmm, all fixed effects and ID as random effect-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# QQ{-}plot of residuals}
+\FunctionTok{qqnorm}\NormalTok{(}\FunctionTok{resid}\NormalTok{(allwRE\_mod))}
+\FunctionTok{qqline}\NormalTok{(}\FunctionTok{resid}\NormalTok{(allwRE\_mod))}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/lmm, all fixed effects and ID as random effect-2.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Histogram of residuals}
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{resid}\NormalTok{(allwRE\_mod), }\AttributeTok{breaks =} \DecValTok{30}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{SRKW-QERM514_LMM_files/SRKW-QERM514_LMM_files/figure-latex/lmm, all fixed effects and ID as random effect-3.pdf}}
+All effect sizes are small and none of the predictors are significant.
+
+Checking our assumptions, there is some structure in the residual vs
+fitted plot. There is a clear line of points at the top right of the
+plot. This is a bit concerning for me for sure. For the QQ plot, I am
+not surprised to see heavy deviation from the line in the top right. We
+saw from our histogram that our data was heavy-tailed, particularly in
+the higher quantiles, which is reflected in the histogram.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{performance}\SpecialCharTok{::}\FunctionTok{r2}\NormalTok{(allwRE\_mod)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # R2 for Mixed Models
+## 
+##   Conditional R2: 0.216
+##      Marginal R2: 0.059
+\end{verbatim}
+
+The marginal \(R^2\) is 0.059, meaning that this model is a poor fit
+(accounts for \textless6\% of the variation in the data). I report the
+marginal based on the 5/15 lab conversation.
+
+Though there are some issues with this model, I'm still going to examine
+the fixed effects to see what combination of fixed effects best fits the
+data.
+
+Also, there are a few points (412, 397, and 376 especially) that may
+have high leverage, and probably need to be looked at a little closer.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{infl  }\OtherTok{\textless{}{-}} \FunctionTok{influence}\NormalTok{(allwRE\_mod, }\AttributeTok{obs =} \ConstantTok{TRUE}\NormalTok{)      }\CommentTok{\# or group = "ID"}
+\NormalTok{cd    }\OtherTok{\textless{}{-}} \FunctionTok{cooks.distance}\NormalTok{(infl)}
+\NormalTok{ord   }\OtherTok{\textless{}{-}} \FunctionTok{order}\NormalTok{(cd, }\AttributeTok{decreasing =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{head}\NormalTok{(ord)              }\CommentTok{\# row numbers of most influential obs}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 444 443 364 412 393 413
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cd[ord[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{]]          }\CommentTok{\# their Cook\textquotesingle{}s distances}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.03727390 0.03377404 0.03250634 0.02724180 0.02610150 0.01735461
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_chin[ord[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{], ]   }\CommentTok{\# inspect those rows}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     Sample_name     y Sample_no         Sample_name2       ID Pre.Post_hormone
+## 444 SRR27755031 0.002        NA 2015Jan02-A-reex_S24     fail             <NA>
+## 443 SRR27755032 0.003        NA       2015Jan02-A_S1     fail             <NA>
+## 364 SRR27755003 0.998        NA        52196-161_S42     fail             <NA>
+## 412 SRR27755250 0.000        NA         52390-35_S29 52390-34             <NA>
+## 393 SRR27755147 0.001        NA         52389-16_S11     fail             <NA>
+## 413 SRR27755269 0.004        NA         52390-36_S30 52390-36             <NA>
+##     Year Month Day Pod FieldID   X     LabID     Sample.ID          Sex pedPod
+## 444 2015   Jan   2 UNK    <NA> 271 52196-038  2015Jan10-02         fail   <NA>
+## 443 2015   Jan   2 UNK    <NA> 270 52196-038  2015Jan10-02         fail   <NA>
+## 364 2017   Sep  21 UNK    <NA>  59 52196-161  2017SEP21-06         fail   <NA>
+## 412 2021   Oct  22 UNK    <NA> 111  52390-35 2021Oct22-04b       Female      L
+## 393 2020   Sep  11   K    <NA>  90  52389-16  2020Sep11-03 Undetermined   <NA>
+## 413 2021   Oct  22 UNK    <NA> 112  52390-36 2021Oct22-05b         Male      L
+##     Region MiSeq.run Population latitudeN longitudeW                  X.1
+## 444     WA      2016       SRKW  47.81054   122.4193   47.81054_122.41929
+## 443     WA      2016       SRKW  47.81054   122.4193   47.81054_122.41929
+## 364     WA      2019       SRKW  48.97225   123.1171   48.97225_123.11713
+## 412     WA    2021P2       SRKW  48.46862   124.6941  48.468623_124.69409
+## 393     WA    2021P2       SRKW  48.55678   123.2309 48.556775_123.230931
+## 413     WA    2021P2       SRKW  48.46862   124.6941  48.468623_124.69409
+##              dom.sp          prey50 TopRel         Run   yy  mon   dd
+## 444 Raja binoculata Raja binoculata   <NA> SRR27755031 <NA> <NA> <NA>
+## 443 Raja binoculata Raja binoculata   <NA> SRR27755032 <NA> <NA> <NA>
+## 364         chinook         chinook   <NA> SRR27755003 <NA> <NA> <NA>
+## 412       sablefish       sablefish     PO SRR27755250 <NA> <NA> <NA>
+## 393            coho            coho   <NA> SRR27755147 <NA> <NA> <NA>
+## 413            <NA>            None     PO SRR27755269 <NA> <NA> <NA>
+##     year_from_name month_from_name day_from_name       date julian_day
+## 444             NA            <NA>            NA 2015-01-02          2
+## 443             NA            <NA>            NA 2015-01-02          2
+## 364             NA            <NA>            NA 2017-09-21        264
+## 412             NA            <NA>            NA 2021-10-22        295
+## 393             NA            <NA>            NA 2020-09-11        255
+## 413             NA            <NA>            NA 2021-10-22        295
+##     pod_from_id y_nudge   y_logit
+## 444        <NA>   0.002 -6.212606
+## 443        <NA>   0.003 -5.806138
+## 364        <NA>   0.998  6.212606
+## 412        <NA>   0.001 -6.906755
+## 393        <NA>   0.001 -6.906755
+## 413        <NA>   0.004 -5.517453
+\end{verbatim}
+
+Cook's distances of \textgreater{} 4/n may need a further look.
+4/468≈0.0085. That's a pretty small number, and my influential points
+have a CD \textgreater{} 0.0085. However, they are all \textless0.5, and
+\textless\textless1, so I am not worried about high leverage points.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  only pod as a fixed effect + my random effect \[
+  y_i = \beta_0 - \beta_1 Pod_i + \delta_{ID_i}+ \epsilon_i \\
+  \epsilon_i \sim \text{N}(0, \sigma_\epsilon^2) \\
+  \delta_{i} \sim \text{N}(0, \sigma_\delta^2) \\
+  \]
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{podwRE\_mod }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(y\_logit }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Pod }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{|}\NormalTok{ ID), }\AttributeTok{data =}\NormalTok{ df\_chin)}
+\FunctionTok{summary}\NormalTok{(podwRE\_mod)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Linear mixed model fit by REML ['lmerMod']
+## Formula: y_logit ~ Pod + (1 | ID)
+##    Data: df_chin
+## 
+## REML criterion at convergence: 2462.4
+## 
+## Scaled residuals: 
+##      Min       1Q   Median       3Q      Max 
+## -2.68088 -0.67780  0.00332  0.83634  1.87667 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  ID       (Intercept)  2.593   1.610   
+##  Residual             13.529   3.678   
+## Number of obs: 444, groups:  ID, 100
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept)   2.2915     0.4094   5.597
+## PodK         -0.4022     0.7602  -0.529
+## PodL          0.3511     0.6210   0.565
+## PodUNK       -1.0474     0.8987  -1.165
+## 
+## Correlation of Fixed Effects:
+##        (Intr) PodK   PodL  
+## PodK   -0.538              
+## PodL   -0.659  0.355       
+## PodUNK -0.447  0.252  0.295
+\end{verbatim}
+
+All effect sizes are similary small and non-significant.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{performance}\SpecialCharTok{::}\FunctionTok{r2}\NormalTok{(podwRE\_mod)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # R2 for Mixed Models
+## 
+##   Conditional R2: 0.173
+##      Marginal R2: 0.014
+\end{verbatim}
+
+The marginal \(R^2\) is 0.014. This model is worse than all the fixed
+effects included.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  only year as a fixed effect + my random effect \[
+  y_i = \beta_0 - \beta_1 Year_i + \delta_{ID_i}+ \epsilon_i \\
+  \epsilon_i \sim \text{N}(0, \sigma_\epsilon^2) \\
+  \delta_{i} \sim \text{N}(0, \sigma_\delta^2) \\
+  \]
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{YearwRE\_mod }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(y\_logit }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Year }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{|}\NormalTok{ ID), }\AttributeTok{data =}\NormalTok{ df\_chin)}
+\FunctionTok{summary}\NormalTok{(YearwRE\_mod)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Linear mixed model fit by REML ['lmerMod']
+## Formula: y_logit ~ Year + (1 | ID)
+##    Data: df_chin
+## 
+## REML criterion at convergence: 2471.3
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.5727 -0.6758 -0.0140  0.8798  1.6523 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  ID       (Intercept)  2.449   1.565   
+##  Residual             13.555   3.682   
+## Number of obs: 444, groups:  ID, 100
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 113.05356   81.03207   1.395
+## Year         -0.05498    0.04020  -1.368
+## 
+## Correlation of Fixed Effects:
+##      (Intr)
+## Year -1.000
+\end{verbatim}
+
+Again, I see no significant effects.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{performance}\SpecialCharTok{::}\FunctionTok{r2}\NormalTok{(YearwRE\_mod)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # R2 for Mixed Models
+## 
+##   Conditional R2: 0.157
+##      Marginal R2: 0.005
+\end{verbatim}
+
+The marginal \(R^2\) is 0.005. This model is much worse than all the
+fixed effects included and just pod inlcuded as a fixed effect.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  only julian day as a fixed effect + my random effect. \[
+  y_i = \beta_0 - \beta_1 julian_i + \delta_{ID_i)+ \epsilon_i \\
+  \epsilon_i \sim \text{N}(0, \sigma_\epsilon^2) \\
+  \delta_{i} \sim \text{N}(0, \sigma_\delta^2) \\
+  \]
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julwRE\_mod }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(y\_logit }\SpecialCharTok{\textasciitilde{}}\NormalTok{ julian\_day }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{|}\NormalTok{ ID), }\AttributeTok{data =}\NormalTok{ df\_chin)}
+\FunctionTok{summary}\NormalTok{(julwRE\_mod)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Linear mixed model fit by REML ['lmerMod']
+## Formula: y_logit ~ julian_day + (1 | ID)
+##    Data: df_chin
+## 
+## REML criterion at convergence: 2377.6
+## 
+## Scaled residuals: 
+##      Min       1Q   Median       3Q      Max 
+## -2.83574 -0.66198 -0.01292  0.87858  1.86197 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  ID       (Intercept)  2.496   1.580   
+##  Residual             13.144   3.625   
+## Number of obs: 428, groups:  ID, 99
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept)  4.740098   0.621456   7.627
+## julian_day  -0.011497   0.002612  -4.402
+## 
+## Correlation of Fixed Effects:
+##            (Intr)
+## julian_day -0.908
+\end{verbatim}
+
+Similar to previous models in that there are no significant effects
+here.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{performance}\SpecialCharTok{::}\FunctionTok{r2}\NormalTok{(julwRE\_mod)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # R2 for Mixed Models
+## 
+##   Conditional R2: 0.195
+##      Marginal R2: 0.043
+\end{verbatim}
+
+The marginal \(R^2\) is 0.043. This model is slightly worse than all the
+fixed effects included, but better than the model with just pod and just
+year.
+
+To use another model selection tool other than \(R^2\), I will calculate
+the AICc and Akaike weights to compare these models:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\# Collect models in a named list}
+\NormalTok{mod\_list }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+  \AttributeTok{allwRE\_mod =}\NormalTok{ allwRE\_mod, }
+  \AttributeTok{podwRE\_mod =}\NormalTok{ podwRE\_mod,}
+  \AttributeTok{YearwRE\_mod =}\NormalTok{ YearwRE\_mod,}
+  \AttributeTok{julwRE\_mod =}\NormalTok{ julwRE\_mod}
+  
+\NormalTok{)}
+
+\DocumentationTok{\#\# Compute AICc for each}
+\NormalTok{mod\_res }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{model =} \FunctionTok{names}\NormalTok{(mod\_list),}
+  \AttributeTok{AICc  =} \FunctionTok{sapply}\NormalTok{(mod\_list, MuMIn}\SpecialCharTok{::}\NormalTok{AICc)}
+\NormalTok{)}
+
+\DocumentationTok{\#\# Order by AICc}
+\NormalTok{mod\_res }\OtherTok{\textless{}{-}}\NormalTok{ mod\_res[}\FunctionTok{order}\NormalTok{(mod\_res}\SpecialCharTok{$}\NormalTok{AICc), ]}
+
+\DocumentationTok{\#\# ΔAICc}
+\NormalTok{mod\_res}\SpecialCharTok{$}\NormalTok{delta\_AICc }\OtherTok{\textless{}{-}}\NormalTok{ mod\_res}\SpecialCharTok{$}\NormalTok{AICc }\SpecialCharTok{{-}} \FunctionTok{min}\NormalTok{(mod\_res}\SpecialCharTok{$}\NormalTok{AICc)}
+
+\DocumentationTok{\#\# Akaike weights based on AICc}
+\NormalTok{mod\_res}\SpecialCharTok{$}\NormalTok{weight }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(}\SpecialCharTok{{-}}\FloatTok{0.5} \SpecialCharTok{*}\NormalTok{ mod\_res}\SpecialCharTok{$}\NormalTok{delta\_AICc)}
+\NormalTok{mod\_res}\SpecialCharTok{$}\NormalTok{weight }\OtherTok{\textless{}{-}}\NormalTok{ mod\_res}\SpecialCharTok{$}\NormalTok{weight }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(mod\_res}\SpecialCharTok{$}\NormalTok{weight)}
+
+\DocumentationTok{\#\# Round for easier viewing}
+\NormalTok{mod\_res}\SpecialCharTok{$}\NormalTok{AICc        }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(mod\_res}\SpecialCharTok{$}\NormalTok{AICc, }\DecValTok{2}\NormalTok{)}
+\NormalTok{mod\_res}\SpecialCharTok{$}\NormalTok{delta\_AICc  }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(mod\_res}\SpecialCharTok{$}\NormalTok{delta\_AICc, }\DecValTok{2}\NormalTok{)}
+\NormalTok{mod\_res}\SpecialCharTok{$}\NormalTok{weight      }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(mod\_res}\SpecialCharTok{$}\NormalTok{weight, }\DecValTok{2}\NormalTok{)}
+
+\NormalTok{mod\_res}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                   model    AICc delta_AICc weight
+## julwRE_mod   julwRE_mod 2385.65       0.00   0.92
+## allwRE_mod   allwRE_mod 2390.62       4.97   0.08
+## podwRE_mod   podwRE_mod 2474.62      88.97   0.00
+## YearwRE_mod YearwRE_mod 2479.35      93.70   0.00
+\end{verbatim}
+
+According to the AICc and Akaike weights, the best model here is
+actually the model that just includes julian day, even though it's
+\(R^2\) was a bit worse than the model that included all the fixed
+effects.
+
+In summary, across all LMMs, julian\_day had the strongest (though still
+weak) association with Chinook proportion; Pod and Year explained little
+additional variation. Overall effect sizes were small, and model
+diagnostics suggest that a distribution better suited to bounded
+compositional data may be better.
+
+Moving forward, an LMM with a logit transformation on the y may not be
+the best model structure for this data. Many of the assumptions of an
+LMM are probably violated with these data. It may be best to use a GLMM
+instead. In that case, a beta regression with a logit link may be the
+most appropriate. Zooming out, I just used percent chinook in the diet
+here as the y, but there are many other fish detected in this dataset.
+Because the actual data are compositional, there may be other models,
+such as multinomial mixture models, rather than forms of linear models,
+that may be more appropriate for this type of data.
+
+\end{document}
