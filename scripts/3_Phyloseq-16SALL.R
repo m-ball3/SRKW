@@ -46,27 +46,21 @@ ps.16s <- subset_taxa(ps.16s, Kingdom!="Bacteria")
 # Remove samples with total abundance == 0
 ps.16s <- prune_samples(sample_sums(ps.16s) > 0, ps.16s)
 
+## MERGE TO SPECIES HERE (TAX GLOM)
+ps.16s = tax_glom(ps.16s, "Species", NArm = FALSE)
+
 # Filtering to remove taxa with less than 1% of reads assigned in at least 1 sample.
 f1 <- filterfun_sample(function(x) x / sum(x) > 0.01)
-lowcount.filt <- genefilter_sample(ps.16s, f1, A=1)
-ps.16s.filt <- prune_taxa(lowcount.filt, ps.16s)
+lowcount.minor <- genefilter_sample(ps.16s, f1, A=1)
+ps.16s.minor <- prune_taxa(lowcount.minor, ps.16s)
 
-# must be at least 1% of diet in 4 or more samples
+# must be at least 1% of diet in 10 or more samples
 f1 <- filterfun_sample(function(x) x >= 0.01)
-lowcount.filt <- genefilter_sample(ps.16s, f1, A=4)
+lowcount.filt <- genefilter_sample(ps.16s, f1, A=10)
 ps.16s.major <- prune_taxa(lowcount.filt, ps.16s)
-
-# Saves phyloseq obj
-saveRDS(ps.16s, "srkw-ps.16s.ALL")
-
 
 # Plots stacked bar plot of abundance - to confirm presence of NA's
 # plot_bar(ps.16s, fill="Species")
-
-## MERGE TO SPECIES HERE (TAX GLOM)
-ps.16s = tax_glom(ps.16s, "Species", NArm = FALSE)
-ps.16s.filt = tax_glom(ps.16s.filt, "Species", NArm = FALSE)
-ps.16s.major = tax_glom(ps.16s.major , "Species", NArm = FALSE)
 
 # Plots stacked bar plot of abundance - to confirm presence of NA's
 abs <- plot_bar(ps.16s, fill="Species")
@@ -102,6 +96,8 @@ which(is.nan(as.matrix(otu_table(ps.16s.filt.rel))), arr.ind = TRUE)
 which(is.nan(as.matrix(otu_table(ps.16s.major.rel))), arr.ind = TRUE)
 
 #SAVES
+
+save(ps.16s, ps16s.rel, samdf_filt, seqtab.nochim_filt, taxam, track, out, freq.nochim, file = "srkw-ps.16s.RData")
 save(seqtab.nochim_filt, freq.nochim, track, taxam, ps16s.rel, ps.16s, file = "SRKW-diet-16SALL.Rdata")
 save(seqtab.nochim_filt, freq.nochim, track, taxam, ps.16s.filt, ps.16s.filt.rel, file = "SRKW-diet-FILT-16SALL.Rdata")
 save(seqtab.nochim_filt, freq.nochim, track, taxam, ps.16s.major, ps.16s.major.rel, file = "SRKW-diet-MAJOR-16SALL.Rdata")
@@ -148,87 +144,6 @@ ggsave("Deliverables/ALL/srkw-species.png", plot = sp.rel.plot, width = 40, heig
 ggsave("Deliverables/ALL/srkw-genus.png", plot = gen.rel.plot, width = 30, height = 8, units = "in", dpi = 300)
 
 ggsave("Deliverables/ALL/srkw-family.png", plot = fam.rel.plot, width = 30, height = 8, units = "in", dpi = 300)
-
-# # ------------------------------------------------------------------
-# # FORMATS DATA AND PLOTS RELATIVE ABUNDANCE BY PRE OR POST HORMONE ANALYSIS
-# # ------------------------------------------------------------------
-# 
-# # Ensure sample_data is a data frame and ID columns as character
-# hormone <- as(sample_data(ps.16s), "data.frame")
-# hormone$ID <- as.character(hormone$ID)
-# hormone$Pre.Post_hormone <- as.character(hormone$Pre.Post_hormone)
-# hormone$Sample_name <- as.character(hormone$Sample_name)
-# 
-# # Specify your chosen sample names explicitly
-# samples_to_keep <- c(
-#   "F24MAY27-02A-S11",
-#   "F24MAY27-02A-Post-S12",
-#   "F24JUN01-01C-S14",
-#   "F24JUN01-01C-Post-S15",
-#   "F24OCT29-06B-S20",
-#   "F24OCT29-06B-Post-S21",
-#   "06Oct2024-3-S25",
-#   "06Oct2024-3-Post-S26",
-#   "F25SEP08-03A-S16",
-#   "F25SEP08-03A-Post-S17",
-#   "F25NOV10-02A-S20",
-#   "F25NOV10-02A-Post-S21",
-#   "F25Sept16-01MS-S25",
-#   "F25Sept16-01MS-Post-S26",
-#   "F26JAN13-08-MS-S35",
-#   "F26JAN13-08-MS-Post-S36"
-# )
-# 
-# ps16s.abs.filtered <- prune_samples(samples_to_keep, ps.16s)
-# 
-# # Plot with nicer x labels
-# faucet.abs <- plot_bar(ps16s.abs.filtered, fill = "Species") +
-#   facet_wrap(~ Pre.Post_hormone, ncol = 1, scales = "free_x", strip.position = "right") +
-#   theme_minimal() +
-#   theme(
-#     axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
-#     strip.background = element_blank(),
-#     strip.placement = "outside",
-#     panel.spacing = unit(0.5, "lines"),
-#     axis.title.x = element_text(margin = margin(t = 10))
-#   )
-# 
-# faucet.abs
-# 
-# # Ensure sample_data is a data frame and ID columns as character
-# hormone <- as(sample_data(ps16s.rel), "data.frame")
-# hormone$ID <- as.character(hormone$ID)
-# hormone$Pre.Post_hormone <- as.character(hormone$Pre.Post_hormone)
-# hormone$Sample_name <- as.character(hormone$Sample_name)
-# 
-# #Checks for NaN's
-# which(is.nan(as.matrix(otu_table(ps16s.rel))), arr.ind = TRUE)
-# 
-# # Prune phyloseq object to retain only these samples
-# ps16s.filtered <- prune_samples(samples_to_keep, ps16s.rel)
-# 
-# # Plot with nicer x labels
-# faucet <- plot_bar(ps16s.filtered, fill = "Species") +
-#   facet_wrap(~ Pre.Post_hormone, ncol = 1, scales = "free_x", strip.position = "right") +
-#   theme_minimal() +
-#   theme(
-#     axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
-#     strip.background = element_blank(),
-#     strip.placement = "outside",
-#     panel.spacing = unit(0.5, "lines"),
-#     axis.title.x = element_text(margin = margin(t = 10))
-#   )
-# 
-# faucet
-# 
-# 
-# 
-# #saves plots
-# ggsave("Deliverables/Plate1/srkw-pre-post-hormone.relative-all.png", plot = faucet, width = 16, height = 8, units = "in", dpi = 300)
-# ggsave("Deliverables/Plate1/srkw-pre-post-hormone.absolute-all.png", plot = faucet.abs, width = 16, height = 8, units = "in", dpi = 300)
-# 
-# #SAVES
-# save(seqtab.nochim, freq.nochim, track, taxam, ps16s.rel, ps.16s, file = "SRKW-diet-16SALL.Rdata")
 
 # ------------------------------------------------------------------
 # PREY ANALYSIS BY POD
