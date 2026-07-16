@@ -40,7 +40,11 @@ seqtab.nochim_filt <- seqtab.nochim_filt[!rownames(seqtab.nochim_filt) %in% not_
 
 # DEALS WITH REPLICATES
 
+
 # F22MAY30_05B_S3 this is a subsample of F22MAY30_05A_S2
+# I think F25NOV10-02A is also has replicates
+
+
 # replicates <- c(
 #   ""
 # )

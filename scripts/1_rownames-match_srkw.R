@@ -19,13 +19,13 @@ library(lubridate)
 #load("C:/Users/MBall/OneDrive/文档/WADE LAB/Arctic-predator-diet-microbiome/DADA2/DADA2 Outputs/WADE003-arcticpred_dada2_QAQC_16SP2_output.Rdata")
 load("C:/Users/MBall/OneDrive - UW/Documents/WADE LAB/SRKW/DADA2/DADA2 Outputs/SRKW-diet-933.Rdata")
 out_df<- as.data.frame(out)
-
+seqtab <- as.data.frame(seqtab.nochim)
 
 mean(out_df$reads.out)
 range(out_df$reads.out)
 
 write.csv(out_df, "./Deliverables/ALL/SRKW_ALL-inout.csv", row.names = TRUE)
-
+write.csv(seqtab, "./Deliverables/ALL/SRKW_ALL-seqtab.csv", row.names = TRUE)
 # Gets sample metadata
 samdf <- read.csv("C:/Users/MBall/OneDrive - UW/Documents/WADE LAB/SRKW/metadata/ALL/SRKW_Diet_SDZWA_MetaData.csv")
 

@@ -17,75 +17,20 @@ library(tidygeocoder)
 library(readxl)
 
 # Loads in data
-meta <- read_csv("metadata/ALL/SRKW_Diet_ALL_MetaData.csv")
+load("replicates-contaminated.RData")
 
-
-# ------------------------------------------------------------------
-# Exploration - Cleans up and adds columns to metadata
-# ------------------------------------------------------------------
-# Assign Year as a factor
-meta$Year <- factor(meta$Year)
-
-# Assign season based on month
-meta <- meta %>%
-  mutate(
-    Season = case_when(
-      Month %in% c("Spring", "Summer", "Fall", "Winter") ~ Month,
-      Month %in% c("Dec", "Jan", "Feb") ~ "Winter",
-      Month %in% c("Mar", "Apr", "May") ~ "Spring",
-      Month %in% c("Jun", "Jul", "Aug") ~ "Summer",
-      Month %in% c("Sep", "Oct", "Nov") ~ "Fall",
-      TRUE ~ NA_character_
-    )
-  )
-
-# Assign pod based on ID
-# Creates pod column from ID column
-meta <- meta %>%
-  mutate(Pod = case_when(
-    grepl("^J", ID) ~ "J",
-    grepl("^K", ID) ~ "K",
-    grepl("^L", ID) ~ "L",
-    TRUE            ~ NA_character_
-  ))
-
-# Adds in another column for age
-## differences in diet for <1 year vs >= 1 yar per ADFG 
-# meta <- meta %>%
-#   mutate(
-#     Tooth_age = na_if(Tooth_age, "unk"),
-#     Tooth_age = as.numeric(as.character(Tooth_age)),  # Convert to numeric, coercing invalid to NA
-#     age_group = case_when(
-#       is.na(Tooth_age) ~ NA_character_,
-#       Tooth_age < 1 ~ "nursing",
-#       TRUE ~ "post weaning"
-#     ),
-#     Tooth_age = factor(Tooth_age)  # Factor after all mutations
-#   )
-
-# # Adds a column for the DB used in diet analysis
-# meta <- meta %>%
-#   mutate(
-#     sample_DB = case_when(
-#       Location == "Cook Inlet" ~ "cookinletDB",
-#       Location %in% c("Hooper Bay", "Scammon Bay") ~ "sberingDB",
-#       Predator == "beluga whale" & Location == "Nome" ~ "sberingDB",
-#       TRUE ~ "arcticDB"
-#     )
-#   )
-
-# Remove rows with NA in faceting variables
-meta_clean <- meta %>% 
-  filter(!is.na(Year), !is.na(Pod))
+meta <- samdf_filt
 
 # Consolidates F and Female and M and Male
-meta_clean <- meta_clean %>%
+meta_clean <- meta %>%
   mutate(
     Sex = dplyr::recode(Sex,
                         "F" = "Female",
                         "M" = "Male", 
                         "Undetermined" = "UNK")
   )
+
+meta_clean$Year <- factor(meta_clean$Year)
 
 # ------------------------------------------------------------------
 # Exploration - Bar Plots
@@ -113,12 +58,9 @@ p0 <- ggplot(meta_clean, aes(x = Year, fill = "lightblue")) +
 p0
 
 # plots sample count by year, faceted by pod and sex
+
 p1 <- ggplot(meta_clean, aes(x = Year, fill = Pod)) +
   geom_bar() +
-  # geom_text(stat = "count",
-  #           aes(label = ..count..),
-  #           vjust = -0.3,
-  #           size = 5) +
   labs(x = "", y = "Sample Count") +
   scale_y_continuous(expand = y_expand) +
   theme_test(base_size = base_size) +
@@ -145,11 +87,20 @@ p2 <- ggplot(meta_clean, aes(x = ID, fill = Pod)) +
   ) +
   scale_fill_brewer(palette = "Paired")
 p2
-
+ggsave()
+ggsave(
+  filename   = "./Deliverables/ALL/IDbyPod.jpg",
+  plot       = p2,
+  width      = 6000,
+  height     = 2000,
+  units      = "px",
+  dpi        = 300,      # or 96 if you want 1:1 pixels
+  limitsize  = FALSE     # still okay, but no longer necessary
+)
 # plots sample count by season, colored by pod
-p3 <- ggplot(meta_clean, aes(x = ID, fill = Pod)) +
+p3 <- ggplot(meta_clean, aes(x = season)) +
   geom_bar() +
-  facet_wrap(~ Season, scales = "free_x", ncol = 1, strip.position = "right") +
+  # facet_wrap(~ season, scales = "free_x", ncol = 1, strip.position = "right") +
   geom_text(stat = "count",
             aes(label = ..count..),
             vjust = -0.3,

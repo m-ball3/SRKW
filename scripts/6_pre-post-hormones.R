@@ -1,7 +1,9 @@
 # ------------------------------------------------------------------
 # PRE AND POST HORMONE ANALYSIS
 # THIS IS THE OPTIONAL FIFTH STEP AFTER DADA2
-## Phyloseq-16SALL.R must be run before this!
+## 3_phyloseq_srkw must be run before this!
+## 5_rarefaction_srkw.R optional to run before this, but should not 
+## be used for clr and Aitchison distance!!
 # ------------------------------------------------------------------
 
 getRversion()
@@ -11,9 +13,10 @@ library(phyloseq)
 library(tidyverse)
 library(vegan)
 library(patchwork)
+library(robCompositions)
 
 # loads
-load("rarefaction.RData")
+load("srkw-ps.16s.Rdata")
 packageVersion("vegan")
 
 # ------------------------------------------------------------------
@@ -21,7 +24,7 @@ packageVersion("vegan")
 # ------------------------------------------------------------------
 
 # Ensure sample_data is a data frame and ID columns as character
-hormone <- as(sample_data(ps_rarefied), "data.frame")
+hormone <- as(sample_data(ps.16s), "data.frame")
 hormone$ID <- as.character(hormone$ID)
 hormone$Pre.Post_hormone <- as.character(hormone$Pre.Post_hormone)
 hormone$Sample_name <- as.character(hormone$Sample_name)
@@ -46,18 +49,34 @@ samples_to_keep <- c(
   "F26JAN13-08-MS-Post-S36"
 )
 
+# -----------------------------
+# ABSOLUTE ABUNDANCE PHYLOSEQ
+# -----------------------------
+
 ps16s.abs.filtered <- prune_samples(samples_to_keep, ps.16s)
 
 # Creates a df that has the sample name, and then the pre or post (for a side by side comparison on the stacked bar plots)
 # Extract sample_data as a data.frame
-sd <- data.frame(sample_data(ps16s.abs.filtered))
+sd_abs <- data.frame(sample_data(ps16s.abs.filtered))
 
 # Remove underscore and everything after it
-sd$Sample_name <- sub("_.*", "", sd$Sample_name)
-sd$Sample_name <- sub("-.*", "", sd$Sample_name)
+sd_abs$Sample_name <- sub("_.*", "", sd_abs$Sample_name)
+sd_abs$Sample_name <- sub("-.*", "", sd_abs$Sample_name)
+
+# renames samples to 1, 2, 3...
+# Order samples in the exact sequence you want
+sd_abs <- sd_abs[match(samples_to_keep, rownames(sd_abs)), ]
+
+# Assign an index 1..n per paired pre/post sample.
+# Assuming two rows per Sample_name, you want an index per unique Sample_name:
+sd_abs$Sample_index <- as.integer(factor(sd_abs$Sample_name))  # 1,2,3,...
+
+# makes it so that Pre comes before Post
+sd_abs$PrePost <- factor(sd_abs$Pre.Post_hormone,
+                         levels = c("Pre", "Post"))  # enforce Pre then Post
 
 # Assign back to the phyloseq object
-sample_data(ps16s.abs.filtered) <- sample_data(sd)
+sample_data(ps16s.abs.filtered) <- sample_data(sd_abs)
 
 # creates a vector of custom colors for the stacked bar plot
 # Manual color palette based on the graph/reference style:
@@ -95,116 +114,90 @@ species_cols <- c(
 #3B3B3B
 
 # Plot with nicer x labels
-faucet.abs <- plot_bar(ps16s.abs.filtered, fill = "Species") +
-  facet_wrap(~ Sample_name, ncol = 20, scales = "free_x", strip.position = "top") +
+faucet.abs <- plot_bar(ps16s.abs.filtered,
+                       x = "PrePost", fill = "Species") +
+  facet_wrap(~ Sample_index, ncol = 20,
+             scales = "free_x", strip.position = "top") +
   scale_fill_manual(
     values = species_cols,
     na.value = "grey60",
     drop = FALSE
-  )+
+  ) +
   theme_bw() +
   theme(
-    text = element_text(size = 14),
-    axis.text.x  = element_blank(),
-    axis.title.x = element_blank(), 
+    text          = element_text(size = 14),
+    axis.text.x   = element_blank(),
+    axis.title.x  = element_blank(),
     strip.background = element_blank(),
-    strip.placement = "outside",
-    panel.spacing = unit(0.5, "lines"),
-    legend.position = "none"
+    strip.placement  = "outside",
+    panel.spacing    = unit(0.5, "lines"),
+    legend.position  = "none"
   )
 
 faucet.abs
 
+# -----------------------------
+# RELATIVE ABUNDANCE PHYLOSEQ
+# -----------------------------
+
 # Ensure sample_data is a data frame and ID columns as character
-hormone <- as(sample_data(ps_rarefied.rel), "data.frame")
+hormone <- as(sample_data(ps16s.rel), "data.frame")
 hormone$ID <- as.character(hormone$ID)
 hormone$Pre.Post_hormone <- as.character(hormone$Pre.Post_hormone)
 hormone$Sample_name <- as.character(hormone$Sample_name)
 
 #Checks for NaN's
-which(is.nan(as.matrix(otu_table(ps_rarefied.rel))), arr.ind = TRUE)
+which(is.nan(as.matrix(otu_table(ps16s.rel))), arr.ind = TRUE)
 
 # Prune phyloseq object to retain only these samples
-ps16s.rel.filtered <- prune_samples(samples_to_keep, ps_rarefied.rel)
+ps16s.rel.filtered <- prune_samples(samples_to_keep, ps16s.rel)
 
 # Creates a df that has the sample name, and then the pre or post (for a side by side comparison on the stacked bar plots)
 # Extract sample_data as a data.frame
-sd2 <- data.frame(sample_data(ps16s.rel.filtered))
+sd_rel <- data.frame(sample_data(ps16s.rel.filtered))
 
 # Remove underscore and everything after it
-sd2$Sample_name <- sub("_.*", "", sd2$Sample_name)
-sd2$Sample_name <- sub("-.*", "", sd2$Sample_name)
+sd_rel$Sample_name <- sub("_.*", "", sd_rel$Sample_name)
+sd_rel$Sample_name <- sub("-.*", "", sd_rel$Sample_name)
+
+# Order samples in the exact sequence you want
+sd_rel <- sd_rel[match(samples_to_keep, rownames(sd_rel)), ]
+
+# Assign an index 1..n per paired pre/post sample.
+sd_rel$Sample_index <- as.integer(factor(sd_rel$Sample_name))  # 1,2,3,...
+
+# makes it so that Pre comes before Post
+sd_rel$PrePost <- factor(sd_rel$Pre.Post_hormone,
+                         levels = c("Pre", "Post"))  # enforce Pre then Post
 
 # Assign back to the phyloseq object
-sample_data(ps16s.rel.filtered) <- sample_data(sd2)
+sample_data(ps16s.rel.filtered) <- sample_data(sd_rel)
 
 ## COULD ADD A COLUMN TO SAMDF OR WHATEVER THAT STRIPS THE COMMON NAME FROM BOTH, MAKES A PRE AND POST
 ## AND THEN THE PLOT WILL HAVE THEM SIDE BY SIDE GROUPED TOGETHER LIKE IN THE REPLICATES PLOT IN ADFG
 # Plot with nicer x labels
-faucet <- plot_bar(ps16s.rel.filtered, fill = "Species") +
-  facet_wrap(~ Sample_name, ncol = 20, scales = "free_x", strip.position = "top") +
+faucet <- plot_bar(ps16s.rel.filtered,
+                   x = "PrePost",
+                   fill = "Species") +
+  facet_wrap(~ Sample_index, ncol = 20,
+             scales = "free_x", strip.position = "top") +
   scale_fill_manual(
     values = species_cols,
     na.value = "grey60",
     drop = FALSE
-  )+
-  ylab("Proportion") + 
+  ) +
+  xlab("Sample") +
+  ylab("Proportion") +
   theme_bw() +
   theme(
-    text = element_text(size = 14), 
-    # axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+    text            = element_text(size = 14),
     strip.background = element_blank(),
-    strip.text.x     = element_blank(), 
-    strip.placement = "outside",
-    panel.spacing = unit(0.5, "lines"),
-    axis.title.x = element_text(margin = margin(t = 10)),
-    legend.position = "none"
+    strip.text.x     = element_blank(),
+    strip.placement  = "outside",
+    panel.spacing    = unit(0.5, "lines"),
+    axis.title.x     = element_text(margin = margin(t = 10)),
+    legend.position  = "none"
   )
-
-faucet
-
-# modifies the x axis sample labels to just say pre or post
-# Extract the data used by plot_bar
-pd <- faucet$data
-
-# Build a named character vector: names = original Sample values, values = "Pre"/"Post"
-sample_labels <- c(
-  # F24MAY27
-  "F24MAY27-02A-S11"        = "Pre",
-  "F24MAY27-02A-Post-S12"   = "Post",
-  
-  # F24JUN01
-  "F24JUN01-01C-S14"        = "Pre",
-  "F24JUN01-01C-Post-S15"   = "Post",
-  
-  # F24OCT29
-  "F24OCT29-06B-S20"        = "Pre",
-  "F24OCT29-06B-Post-S21"   = "Post",
-  
-  # 06Oct2024
-  "06Oct2024-3-S25"         = "Pre",
-  "06Oct2024-3-Post-S26"    = "Post",
-  
-  # F25SEP08.03A
-  "F25SEP08-03A-S16"        = "Pre",
-  "F25SEP08-03A-Post-S17"   = "Post",
-  
-  # F25NOV10.02A
-  "F25NOV10-02A-S20"        = "Pre",
-  "F25NOV10-02A-Post-S21"   = "Post",
-  
-  # F25Sept16.01MS
-  "F25Sept16-01MS-S25"      = "Pre",
-  "F25Sept16-01MS-Post-S26" = "Post",
-  
-  # F26JAN13.08.MS
-  "F26JAN13-08-MS-S35"      = "Pre",
-  "F26JAN13-08-MS-Post-S36" = "Post"
-)
-
-# Apply labels to the x-axis
-faucet <- faucet +
-  scale_x_discrete(labels = sample_labels)
 
 faucet
 
@@ -212,12 +205,12 @@ combined <- faucet.abs / faucet
 combined
 
 #saves plots
-ggsave("Deliverables/ALL/srkw-pre-post-hormone.relative-all.png", plot = faucet, width = 16, height = 8, units = "in", dpi = 300)
-ggsave("Deliverables/ALL/srkw-pre-post-hormone.absolute-all.png", plot = faucet.abs, width = 16, height = 8, units = "in", dpi = 300)
-ggsave("Deliverables/ALL/srkw-pre-post-hormone.stacked.png", plot = combined, width = 16, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/ALL/srkw-pre-post-hormone.relative-all-NORARERIFY.png",plot = faucet, width = 16, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/ALL/srkw-pre-post-hormone.absolute-all-NORARERIFY.png",plot = faucet.abs, width = 16, height = 8, units = "in", dpi = 300)
+ggsave("Deliverables/ALL/srkw-pre-post-hormone.stacked-NORARERIFY.png",plot = combined, width = 16, height = 8, units = "in", dpi = 300)
 
-
-# # STATS : BRAY-CURTIS PERMANOVA ON RELATIVE ABUNDANCES
+# # STATS : AITCHISON PERMANOVA ON RELATIVE ABUNDANCES 
+# # NOT RAREFIED; USED CLR METHOD PER GLOOR ET AL., 2017
 # FROM WIKIPEDIA: The null hypothesis states that the centroids (averages) and/or the dispersion (spread) of the groups are equivalent in the multivariate space.
 ## H0 - there is no difference in the pre samples vs post samples
 ## HA - there is a difference in the pre samples vs post samples
@@ -225,117 +218,112 @@ ggsave("Deliverables/ALL/srkw-pre-post-hormone.stacked.png", plot = combined, wi
 # filters samdf_filt
 samdf_horm <- samdf_filt[rownames(samdf_filt) %in% samples_to_keep, ]
 
+# creates a new column in samdf_horm that has the Sample_name with the suffix dropped
+## this is so we can identify strata in the permanova
+### meaning that we can account for the paired nature of the data
+samdf_horm$samps <- samdf_horm$Sample_name |>
+  sub("_Post.*", "", x = _) |>
+  sub("_S[0-9]+", "", x = _) |>
+  sub("-Post", "", x = _)
 
-# Calculate a distance matrix (Bray-Curtis)
-bray_matrix <- phyloseq::distance(ps16s.filtered, method = "bray")
+# Extract OTU/ASV table as a plain matrix (for passing to vegdist)
+otu_mat <- as(otu_table(ps16s.rel.filtered), "matrix")  # or as.matrix(otu_table(...))
 
-# Run the PERMANOVA
-permanova_bray. <- adonis2(bray_matrix ~ Pre.Post_hormone, data = samdf_horm, permutations = 999)
+# Decide orientation: vegdist expects rows = samples, columns = variables
+# If taxa_are_rows(ps16s.rel.filtered) is TRUE, transpose:
+if (taxa_are_rows(ps16s.rel.filtered)) {
+  otu_mat <- t(otu_mat)
+}
 
-print(permanova_bray)
-
-
-# STATS : JACCARD PERMANOVA ON ABSOLUTE ABUNDANCES
-jac_matrix <- phyloseq::distance(ps16s.abs.filtered, method = "jaccard")
-
-# Run the PERMANOVA
-
-# Calculate a distance matrix (Jaccard)
-permanova_jac <- adonis2(jac_matrix ~ Pre.Post_hormone, data = samdf_horm, permutations = 999)
-
-print(permanova_jac)
-
-# STATS : JACCARD PERMANOVA ON RELATIVE ABUNDANCES
-
-# Calculate a distance matrix (Jaccard)
-jac_matrix.rel <- phyloseq::distance(ps16s.rel.filtered, method = "jaccard")
+# Robust Aitchison distance
+## Robust method only log-ratio tranforms non-zeros
+## thus, avoiding the need to create data + 1 
+### therefore, it avoids biasing by creating "pseudocounts"
+robust_aitch_dist <- vegdist(otu_mat, method = "robust.aitchison")
 
 # Run the PERMANOVA
-permanova_jac.rel <- adonis2(jac_matrix.rel ~ Pre.Post_hormone, data = samdf_horm, permutations = 999)
+permanova_aitch <- adonis2(robust_aitch_dist ~ Pre.Post_hormone, 
+                           data = samdf_horm, 
+                           strata = samdf_horm$samps, 
+                           permutations = 999)
 
-print(permanova_jac.rel)
-
-
-
-
-
-##### NEW CODE BUT NOT READY YET
-library(phyloseq)
-library(ggplot2)
-library(grid)
-
-# Keep sample order exactly as you want it shown
-samples_to_keep.test <- c(
-  "F24MAY27-02A-S11",
-  "F24MAY27-02A-Post-S12",
-  "F24JUN01-01C-S14",
-  "F24JUN01-01C-Post-S15",
-  "F24OCT29-06B-S20",
-  "F24OCT29-06B-Post-S21",
-  "06Oct2024-3-S25",
-  "06Oct2024-3-Post-S26",
-  "F25SEP08-03A-S16",
-  "F25SEP08-03A-Post-S17",
-  "F25NOV10-02A-S20",
-  "F25NOV10-02A-Post-S21",
-  "F25Sept16-01MS-S25",
-  "F25Sept16-01MS-Post-S26",
-  "F26JAN13-08-MS-S35",
-  "F26JAN13-08-MS-Post-S36"
-)
-
-# Filter objects
-ps16s.abs.filtered.test <- prune_samples(samples_to_keep, ps.16s)
-ps16s.rel.filtered.test <- prune_samples(samples_to_keep, ps_rarefied.rel)
-
-# Force sample order in metadata
-sample_data(ps16s.abs.filtered.test)$Sample_name <- factor(
-  sample_data(ps16s.abs.filtered.test)$Sample_name,
-  levels = samples_to_keep.test
-)
-
-sample_data(ps16s.rel.filtered.test)$Sample_name <- factor(
-  sample_data(ps16s.rel.filtered.test)$Sample_name,
-  levels = samples_to_keep.test
-)
+print(permanova_aitch)
 
 
-
-# Common theme
-base_bar_theme.test <- theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
-    strip.background = element_blank(),
-    strip.placement = "outside",
-    panel.spacing = unit(0.5, "lines"),
-    axis.title.x = element_text(margin = margin(t = 10)),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor = element_blank()
-  )
-
-# Absolute abundance plot
-faucet.abs.test <- plot_bar(ps16s.abs.filtered.test, x = "Sample_name", fill = "Species") +
-  facet_wrap(~ Pre.Post_hormone, ncol = 1, scales = "free_x", strip.position = "right") +
-  scale_fill_manual(
-    values = species_cols.test,
-    na.value = "grey60",
-    drop = FALSE
-  ) +
-  labs(x = "Sample", y = "Abundance") +
-  base_bar_theme.test
-
-faucet.abs.test
-
-# Relative abundance plot
-faucet.test <- plot_bar(ps16s.rel.filtered.test, x = "Sample_name", fill = "Species") +
-  facet_wrap(~ Pre.Post_hormone, ncol = 2, scales = "free_x", strip.position = "top") +
-  scale_fill_manual(
-    values = species_cols.test,
-    na.value = "grey60",
-    drop = FALSE
-  ) +
-  labs(x = "Sample", y = "Abundance") +
-  base_bar_theme.test
-
-faucet.test
-
+# 
+# # OPTIONAL PCA -------------------------------------------------------------------------------------------
+# 
+# # rCLR transform (manually creates the matrix that vegdist creates)
+# otu_rclr <- decostand(otu_mat, method = "rclr")
+# 
+# # Runs PCA on rCLR-transformed data
+# pca_res <- prcomp(otu_rclr, center = TRUE, scale. = FALSE)
+# pca_res
+# 
+# # Scores (sample coordinates in PCA space)
+# pca_scores <- pca_res$x
+# pca_scores
+# 
+# # Loadings (taxon contributions)
+# pca_loadings <- pca_res$rotation
+# pca_loadings
+# 
+# 
+# # PCA scores (samples × PCs)
+# pca_scores <- as.data.frame(pca_res$x)
+# 
+# # Add sample IDs as a column
+# pca_scores$Sample <- rownames(pca_scores)
+# 
+# # Pull metadata from your phyloseq object
+# meta <- data.frame(sample_data(ps16s.rel.filtered))
+# 
+# meta$Sample <- rownames(meta)
+# 
+# # Join scores with metadata
+# pca_plot_df <- pca_scores %>%
+#   left_join(meta, by = "Sample")
+# 
+# var_explained <- summary(pca_res)$importance[2, ]  # proportion per PC [web:244]
+# pc1_pct <- round(var_explained[1] * 100, 1)
+# pc2_pct <- round(var_explained[2] * 100, 1)
+# 
+# p_pca <- ggplot(pca_plot_df,
+#                 aes(x = PC1, y = PC2,
+#                     color = Pre.Post_hormone)) +
+#   geom_point(size = 3, alpha = 0.9) +
+#   labs(
+#     x = paste0("PC1 (", pc1_pct, "% variance)"),
+#     y = paste0("PC2 (", pc2_pct, "% variance)"),
+#     color = "Hormone status"
+#   ) +
+#   theme_bw() +
+#   theme(
+#     text          = element_text(size = 14),
+#     panel.grid    = element_blank(),
+#     legend.position = "right"
+#   )
+# 
+# p_pca
+# 
+# 
+# p_pca_faceted <- ggplot(pca_plot_df,
+#                         aes(x = PC1, y = PC2,
+#                             color = Pre.Post_hormone)) +
+#   geom_point(size = 3, alpha = 0.9) +
+#   facet_wrap(~ Sample_index, ncol = 4) +
+#   labs(
+#     x = paste0("PC1 (", pc1_pct, "% variance)"),
+#     y = paste0("PC2 (", pc2_pct, "% variance)"),
+#     color = "Hormone status"
+#   ) +
+#   theme_bw() +
+#   theme(
+#     text            = element_text(size = 12),
+#     strip.background = element_blank(),
+#     strip.placement  = "outside",
+#     panel.grid       = element_blank(),
+#     legend.position  = "bottom"
+#   )
+# 
+# p_pca_faceted
