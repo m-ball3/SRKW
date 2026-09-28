@@ -30,25 +30,29 @@ ps.16s <- phyloseq(otu_table(seqtab.nochim_filt, taxa_are_rows=FALSE),
                    sample_data(samdf_filt), 
                    tax_table(taxam))
 
+microbiome::summarize_phyloseq(ps.16s) 
+
 ### shorten ASV seq names, store sequences as reference
 dna <- Biostrings::DNAStringSet(taxa_names(ps.16s))
-names(dna) <- taxa_names(ps.16s)
+names(dna) <- phyloseq::taxa_names(ps.16s)
 ps.raw <- merge_phyloseq(ps.16s, dna)
 ps.16s <- merge_phyloseq(ps.raw, dna)
-taxa_names(ps.16s) <- paste0("ASV", seq(ntaxa(ps.16s)))
+phyloseq::taxa_names(ps.16s) <- paste0("ASV", seq(phyloseq::ntaxa(ps.16s)))
 
-nsamples(ps.16s)
+phyloseq::nsamples(ps.16s)
 
 # Filters out any Mammalia and NA
 # CHANGE TO FILTER ANYTHING THAT ISN'T ACTINOPTERI  
-ps.16s <- subset_taxa(ps.16s, Class!="Mammalia")
-ps.16s <- subset_taxa(ps.16s, Kingdom!="Bacteria")
+ps.16s <- phyloseq::subset_taxa(ps.16s, Class!="Mammalia")
+ps.16s <- phyloseq::subset_taxa(ps.16s, Kingdom!="Bacteria")
 
 # Remove samples with total abundance == 0
-ps.16s <- prune_samples(sample_sums(ps.16s) > 0, ps.16s)
+ps.16s <- prune_samples(phyloseq::sample_sums(ps.16s) > 0, ps.16s)
 
 ## MERGE TO SPECIES HERE (TAX GLOM)
 ps.16s = tax_glom(ps.16s, "Species", NArm = FALSE)
+
+microbiome::summarize_phyloseq(ps.16s) 
 
 # BUILD ASV TABLE FOR MANUAL ASSIGNMENTS----------------------------------------
 # # Get ASV IDs for the major taxa
@@ -86,8 +90,8 @@ tax.df$ASV <- rownames(tax.df)
 
 # Join fixed species from asv_table_fixed
 tax_fixed_df <- tax.df %>%
-  left_join(
-    asv_table_fixed %>% select(ASV, Species_fixed),
+  dplyr::left_join(
+    asv_table_fixed %>% dplyr::select(ASV, Species_fixed),
     by = "ASV"
   )
 
@@ -101,12 +105,17 @@ tax_fixed_df$Species <- ifelse(
 # Drop helper columns and convert back to matrix for tax_table
 tax_fixed_mat <- as.matrix(
   tax_fixed_df %>%
-    select(-ASV, -Species_fixed)
+    dplyr::select(-ASV, -Species_fixed)
 )
 rownames(tax_fixed_mat) <- tax_fixed_df$ASV
 
 # Write back into ps.16s
 tax_table(ps.16s) <- tax_fixed_mat
+
+# Filters out any Mammalia and NA
+# CHANGE TO FILTER ANYTHING THAT ISN'T ACTINOPTERI  
+ps.16s <- phyloseq::subset_taxa(ps.16s, Class!="Mammalia")
+ps.16s <- phyloseq::subset_taxa(ps.16s, Kingdom!="Bacteria")
 
 ## RE-MERGE TO SPECIES HERE (TAX GLOM)
 ps.16s = tax_glom(ps.16s, "Species", NArm = FALSE)
@@ -119,7 +128,7 @@ ps16s.rel <- transform_sample_counts(ps.16s, function(x) {
   return(x_rel)
 })
 
-# Filtering to remove taxa with less than 1% of reads assigned in at least 1 sample.
+# Filtering for major and minor prey items
 f1 <- filterfun_sample(function(x) x >= 0.01) 
 
 # “Minor” taxa: ≥1% in at least 1 sample
@@ -161,12 +170,12 @@ which(is.nan(as.matrix(otu_table(ps.16s.minor))), arr.ind = TRUE)
 which(is.nan(as.matrix(otu_table(ps.16s.major))), arr.ind = TRUE)
 
 #SAVES
-
+getwd()
 save(ps.16s, ps16s.rel, samdf_filt, seqtab.nochim_filt, taxam, track, out, freq.nochim, file = "srkw-ps.16s.RData")
-save(seqtab.nochim_filt, freq.nochim, track, taxam, ps16s.rel, ps.16s, file = "SRKW-diet-16SALL.Rdata")
-save(seqtab.nochim_filt, freq.nochim, track, taxam, ps.16s.minor, file = "SRKW-diet-MINOR-16SALL.Rdata")
-save(seqtab.nochim_filt, freq.nochim, track, taxam, ps.16s.major, file = "SRKW-diet-MAJOR-16SALL.Rdata")
-save(seqtab.nochim_filt, freq.nochim, track, taxam, ps.16s.major, ps.16s.major, ps.16s, ps16s.rel, file = "SRKW-diet-MASTER.Rdata")
+save(seqtab.nochim_filt, samdf_filt, freq.nochim, track, taxam, ps16s.rel, ps.16s, file = "SRKW-diet-16SALL.Rdata")
+save(seqtab.nochim_filt, samdf_filt, freq.nochim, track, taxam, ps.16s.minor, file = "SRKW-diet-MINOR-16SALL.Rdata")
+save(seqtab.nochim_filt, samdf_filt, freq.nochim, track, taxam, ps.16s.major, file = "SRKW-diet-MAJOR-16SALL.Rdata")
+save(seqtab.nochim_filt, samdf_filt, freq.nochim, track, taxam, ps.16s.minor, ps.16s.major, ps.16s, ps16s.rel, file = "SRKW-diet-MASTER.Rdata")
 
 # ------------------------------------------------------------------
 # PLOTS RELATIVE ABUNDANCE
